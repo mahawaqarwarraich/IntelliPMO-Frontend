@@ -1,0 +1,33 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply antialiased text-gray-900 bg-gray-50;
+    font-size: 15px;
+    line-height: 1.5;
+  }
+  input,
+  button,
+  select {
+    @apply font-sans text-[15px];
+  }
+  a {
+    @apply text-accent no-underline;
+  }
+  a:hover {
+    @apply underline;
+  }
+}
+
+@keyframes toast-fade-in {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -10px);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+}
