@@ -81,11 +81,17 @@ export default function StudentLoginForm({ onSuccess }) {
       return;
     }
 
+    const payload = {
+      rollNo: values.rollNo.trim(),
+      password: values.password,
+    };
+
     setSubmitting(true);
     try {
-      const res = await api.post('/api/students/login', { rollNo: values.rollNo.trim(), password: values.password });
+      const res = await api.post('/api/students/login', payload);
       showToast(res.data?.message || 'Logged in successfully.', 'success');
       onSuccess?.(res.data);
+      setTimeout(() => navigate('/home'), 1500);
     } catch (err) {
       const data = err.response?.data;
       const message =
@@ -219,17 +225,7 @@ export default function StudentLoginForm({ onSuccess }) {
           {submitting ? 'Signing in…' : 'Log in'}
         </button>
 
-        <p className="mt-4 text-sm text-gray-600 m-0">
-          Don&apos;t have an account?{' '}
-          <button
-            type="button"
-            onClick={() => navigate('/')}
-            className="bg-transparent border-0 p-0 text-accent font-medium cursor-pointer hover:underline focus:outline-none focus:ring-2 focus:ring-accent/30 rounded"
-            aria-label="Go to registration"
-          >
-            Register
-          </button>
-        </p>
+       
         </form>
       </div>
     </div>
