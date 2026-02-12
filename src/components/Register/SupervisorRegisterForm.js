@@ -436,7 +436,7 @@ export default function SupervisorRegisterForm({ onBack, onSubmit, onLogin }) {
        
           <p className="mt-4 text-sm text-gray-600 m-0">
           Already have an account?{' '}
-         <a href="/admin-login" className=' className="bg-transparent border-0 p-0 text-accent font-medium cursor-pointer hover:underline focus:outline-none focus:ring-2 focus:ring-accent/30 rounded"'>Log in</a>
+         <a href="/supervisor-login" className=' className="bg-transparent border-0 p-0 text-accent font-medium cursor-pointer hover:underline focus:outline-none focus:ring-2 focus:ring-accent/30 rounded"'>Log in</a>
         
         </p>
       </form>
