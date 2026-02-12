@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { api } from '../../api/client.js';
+import { api, TOKEN_KEY } from '../../api/client.js';
 
 const MIN_PASSWORD_LENGTH = 6;
 const ROLL_NO_REGEX = /^\d{8}-\d{3}$/;
@@ -89,6 +89,9 @@ export default function StudentLoginForm({ onSuccess }) {
     setSubmitting(true);
     try {
       const res = await api.post('/api/students/login', payload);
+      if (res.data.token) {
+        localStorage.setItem(TOKEN_KEY, res.data.token);
+      }
       showToast(res.data?.message || 'Logged in successfully.', 'success');
       onSuccess?.(res.data);
       setTimeout(() => navigate('/home'), 1500);
