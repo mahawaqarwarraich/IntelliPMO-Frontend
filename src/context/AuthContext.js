@@ -7,6 +7,7 @@ const AuthContext = createContext(null);
 
 export function AuthProvider({ children }) {
   const [user, setUserState] = useState(null);
+  const [isReady, setIsReady] = useState(false);
 
   // On load: restore user from localStorage if we have saved auth
   useEffect(() => {
@@ -23,6 +24,7 @@ export function AuthProvider({ children }) {
       localStorage.removeItem(AUTH_USER_KEY);
       localStorage.removeItem(TOKEN_KEY);
     }
+    setIsReady(true);
   }, []);
 
   const login = (userData) => {
@@ -40,7 +42,10 @@ export function AuthProvider({ children }) {
     localStorage.removeItem(TOKEN_KEY);
   };
 
-  const value = { user, login, logout };
+  // when access backedn api, it return 401, then we call logout that clear
+  // user and navigate to login page
+
+  const value = { user, login, logout, isReady };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
