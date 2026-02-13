@@ -6,12 +6,20 @@ import AdminLoginForm from './components/Login/AdminLoginForm';
 import SupervisorLoginForm from './components/Login/SupervisorLoginForm';
 import EvaluatorLoginForm from './components/Login/EvaluatorLoginForm';
 import Home from './components/Home';
+import ProtectedRoute from './components/ProtectedRoute';
 
 function App() {
   return (
     <Routes>
       <Route path="/" element={<Main />} />
-      <Route path="/home" element={<Home />} />
+      <Route
+        path="/home"
+        element={
+          <ProtectedRoute>
+            <Home />
+          </ProtectedRoute>
+        }
+      />
       <Route path="/student-login" element={<StudentLoginForm />} />
       <Route path="/admin-login" element={<AdminLoginForm />} />
       <Route path="/supervisor-login" element={<SupervisorLoginForm />} />

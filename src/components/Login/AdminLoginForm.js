@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { api } from '../../api/client.js';
+import { api, TOKEN_KEY } from '../../api/client.js';
 import { useAuth } from '../../context/AuthContext.js';
 
 const MIN_PASSWORD_LENGTH = 6;
