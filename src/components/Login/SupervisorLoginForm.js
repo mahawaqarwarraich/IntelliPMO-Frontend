@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { api, TOKEN_KEY } from '../../api/client.js';
+import { api } from '../../api/client.js';
+import { useAuth } from '../../context/AuthContext.js';
 
 const MIN_PASSWORD_LENGTH = 6;
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -32,6 +33,7 @@ const fieldWrapClass = 'flex flex-col gap-1.5 min-w-0';
 
 export default function SupervisorLoginForm({ onSuccess }) {
   const navigate = useNavigate();
+  const { login } = useAuth();
   const [values, setValues] = useState({ email: '', password: '' });
   const [touched, setTouched] = useState({});
   const [submitError, setSubmitError] = useState('');
@@ -89,8 +91,10 @@ export default function SupervisorLoginForm({ onSuccess }) {
     setSubmitting(true);
     try {
       const res = await api.post('/api/supervisors/login', payload);
-      if (res.data.token) {
-        localStorage.setItem(TOKEN_KEY, res.data.token);
+      const id = res.data.supervisor?._id;
+      const token = res.data.token;
+      if (id && token) {
+        login({ id, token, role: 'Supervisor' });
       }
       showToast(res.data?.message || 'Logged in successfully.', 'success');
       onSuccess?.(res.data);

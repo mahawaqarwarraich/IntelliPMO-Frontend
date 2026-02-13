@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { api, TOKEN_KEY } from '../../api/client.js';
+import { api } from '../../api/client.js';
+import { useAuth } from '../../context/AuthContext.js';
 
 const MIN_PASSWORD_LENGTH = 6;
 const ROLL_NO_REGEX = /^\d{8}-\d{3}$/;
@@ -32,6 +33,7 @@ const fieldWrapClass = 'flex flex-col gap-1.5 min-w-0';
 
 export default function StudentLoginForm({ onSuccess }) {
   const navigate = useNavigate();
+  const { login } = useAuth();
   const [values, setValues] = useState({ rollNo: '', password: '' });
   const [touched, setTouched] = useState({});
   const [submitError, setSubmitError] = useState('');
@@ -89,8 +91,10 @@ export default function StudentLoginForm({ onSuccess }) {
     setSubmitting(true);
     try {
       const res = await api.post('/api/students/login', payload);
-      if (res.data.token) {
-        localStorage.setItem(TOKEN_KEY, res.data.token);
+      const id = res.data.student?._id;
+      const token = res.data.token;
+      if (id && token) {
+        login({ id, token, role: 'Student' });
       }
       showToast(res.data?.message || 'Logged in successfully.', 'success');
       onSuccess?.(res.data);
