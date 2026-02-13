@@ -4,6 +4,7 @@ import Main from './components/Main';
 import StudentLoginForm from './components/Login/StudentLoginForm';
 import AdminLoginForm from './components/Login/AdminLoginForm';
 import SupervisorLoginForm from './components/Login/SupervisorLoginForm';
+import EvaluatorLoginForm from './components/Login/EvaluatorLoginForm';
 import Home from './components/Home';
 
 function App() {
@@ -14,6 +15,7 @@ function App() {
       <Route path="/student-login" element={<StudentLoginForm />} />
       <Route path="/admin-login" element={<AdminLoginForm />} />
       <Route path="/supervisor-login" element={<SupervisorLoginForm />} />
+      <Route path="/evaluator-login" element={<EvaluatorLoginForm />} />
     </Routes>
   );
 }
