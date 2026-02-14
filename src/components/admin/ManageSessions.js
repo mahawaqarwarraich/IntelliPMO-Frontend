@@ -62,7 +62,6 @@ export default function ManageSessions() {
     maxMembers: '',
     minGroups: '',
     maxGroups: '',
-    status: 'active',
     numEvaluations: '',
     defense1Weightage: '',
     defense2Weightage: '',
@@ -199,7 +198,7 @@ export default function ManageSessions() {
     const payload = {
       sessionYear: createForm.sessionYear.trim(),
       department: createForm.department,
-      status: createForm.status,
+      status: 'draft',
       minCGPA: Number(createForm.minCGPA),
       minMembers: Number(createForm.minMembers),
       maxMembers: Number(createForm.maxMembers),
@@ -330,18 +329,6 @@ export default function ManageSessions() {
                 <option value="">Select department</option>
                 {DEPARTMENTS.map((d) => (
                   <option key={d} value={d}>{d}</option>
-                ))}
-              </select>
-            </Field>
-            <Field id="create-status" label="Status" error={null}>
-              <select
-                id="create-status"
-                value={createForm.status}
-                onChange={(e) => setCreate('status', e.target.value)}
-                className={inputClass}
-              >
-                {STATUS_OPTIONS.map((o) => (
-                  <option key={o.value} value={o.value}>{o.label}</option>
                 ))}
               </select>
             </Field>
