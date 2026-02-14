@@ -10,6 +10,7 @@ import DashboardPlaceholder from './components/DashboardPlaceholder';
 import ManageSessions from './components/admin/ManageSessions';
 import ManageDomains from './components/admin/ManageDomains';
 import SessionPolicy from './components/all/SessionPolicy';
+import AllDomains from './components/all/AllDomains';
 import ProtectedRoute from './components/ProtectedRoute';
 
 function App() {
@@ -30,7 +31,7 @@ function App() {
         <Route path="admin/manage-domains" element={<ManageDomains />} />
         <Route path="admin/evaluator-panels" element={<DashboardPlaceholder />} />
         <Route path="admin/all-sessions" element={<DashboardPlaceholder />} />
-        <Route path="admin/all-domains" element={<DashboardPlaceholder />} />
+        <Route path="admin/all-domains" element={<AllDomains />} />
         <Route path="admin/all-supervisors" element={<DashboardPlaceholder />} />
         <Route path="admin/all-evaluators" element={<DashboardPlaceholder />} />
         <Route path="admin/groups-defense1" element={<DashboardPlaceholder />} />
@@ -44,7 +45,7 @@ function App() {
         <Route path="admin/group-requests" element={<DashboardPlaceholder />} />
         <Route path="admin/give-marks" element={<DashboardPlaceholder />} />
         <Route path="student/chat-homes" element={<DashboardPlaceholder />} />
-        <Route path="student/all-domains" element={<DashboardPlaceholder />} />
+        <Route path="student/all-domains" element={<AllDomains />} />
         <Route path="student/domains-supervisors" element={<DashboardPlaceholder />} />
         <Route path="student/session-policy" element={<SessionPolicy />} />
         <Route path="student/fyp-resources" element={<DashboardPlaceholder />} />
@@ -57,7 +58,7 @@ function App() {
         <Route path="student/supervisor-allocation" element={<DashboardPlaceholder />} />
         <Route path="student/groups-defense1" element={<DashboardPlaceholder />} />
         <Route path="student/groups-defense2" element={<DashboardPlaceholder />} />
-        <Route path="supervisor/all-domains" element={<DashboardPlaceholder />} />
+        <Route path="supervisor/all-domains" element={<AllDomains />} />
         <Route path="supervisor/domains-supervisors" element={<DashboardPlaceholder />} />
         <Route path="supervisor/session-policy" element={<SessionPolicy />} />
         <Route path="supervisor/fyp-resources" element={<DashboardPlaceholder />} />
@@ -69,7 +70,7 @@ function App() {
         <Route path="supervisor/groups-defense1" element={<DashboardPlaceholder />} />
         <Route path="supervisor/groups-defense2" element={<DashboardPlaceholder />} />
         <Route path="supervisor/give-marks" element={<DashboardPlaceholder />} />
-        <Route path="evaluator/all-domains" element={<DashboardPlaceholder />} />
+        <Route path="evaluator/all-domains" element={<AllDomains />} />
         <Route path="evaluator/domains-supervisors" element={<DashboardPlaceholder />} />
         <Route path="evaluator/session-policy" element={<SessionPolicy />} />
         <Route path="evaluator/fyp-resources" element={<DashboardPlaceholder />} />
