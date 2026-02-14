@@ -50,16 +50,18 @@ function getInitial(str) {
   return str.slice(0, 2).toUpperCase();
 }
 
-export default function Sidebar({ isOpen = true }) {
+export default function Sidebar({ isOpen = true, isOverlay = false, onOverlayClose }) {
   const { user } = useAuth();
   const roleKey = (user?.role || '').toLowerCase();
   const links = sidebarLinks[roleKey] || sidebarLinks.admin;
 
+  const widthClass = isOverlay ? 'w-64' : isOpen ? 'w-64' : 'w-0 min-w-0';
+
   return (
     <aside
-      className={`flex-shrink-0 h-full bg-primary-dark flex flex-col text-white shadow-lg overflow-hidden transition-[width] duration-200 ease-out ${
-        isOpen ? 'w-64' : 'w-0 min-w-0'
-      }`}
+      className={`flex-shrink-0 h-full bg-primary-dark flex flex-col text-white shadow-lg overflow-hidden ${
+        isOverlay ? '' : 'transition-[width] duration-200 ease-out'
+      } ${widthClass}`}
       aria-hidden={!isOpen}
     >
       <div className="flex-shrink-0 p-4 border-b border-white/10">
@@ -80,6 +82,7 @@ export default function Sidebar({ isOpen = true }) {
             <li key={path}>
               <NavLink
                 to={path}
+                onClick={isOverlay && onOverlayClose ? onOverlayClose : undefined}
                 className={({ isActive }) =>
                   `w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-left text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-white/30 block ${
                     isActive ? 'bg-accent text-white' : 'text-white/90 hover:bg-white/10'
