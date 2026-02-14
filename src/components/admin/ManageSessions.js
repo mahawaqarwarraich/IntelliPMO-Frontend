@@ -4,6 +4,7 @@ import { api } from '../../api/client';
 const DEPARTMENTS = ['CS', 'IT', 'SE'];
 const SESSION_YEAR_REGEX = /^\d{4}-\d{4}$/;
 const STATUS_OPTIONS = [
+  { value: 'draft', label: 'Draft' },
   { value: 'active', label: 'Active' },
   { value: 'inactive', label: 'Inactive' },
 ];
@@ -82,9 +83,10 @@ export default function ManageSessions() {
     }, 5000);
   }, []);
 
-  const [statusForm, setStatusForm] = useState({ sessionYear: '', status: 'active' });
+  const [statusForm, setStatusForm] = useState({ sessionYear: '', department: '', status: 'active' });
   const [statusTouched, setStatusTouched] = useState({});
   const [statusSubmitMessage, setStatusSubmitMessage] = useState({ type: '', text: '' });
+  const [statusSubmitting, setStatusSubmitting] = useState(false);
 
   const [deleteForm, setDeleteForm] = useState({ sessionYear: '', department: '' });
   const [deleteTouched, setDeleteTouched] = useState({});
@@ -150,6 +152,7 @@ export default function ManageSessions() {
 
   const statusErrors = {
     sessionYear: validateSessionYear(statusForm.sessionYear),
+    department: statusTouched.department ? (statusForm.department ? null : 'Please select a department.') : null,
   };
   const statusValid = !Object.values(statusErrors).some(Boolean);
 
@@ -214,6 +217,19 @@ export default function ManageSessions() {
         const message = res.data?.message || 'Session saved successfully.';
         setCreateSubmitMessage({ type: 'success', text: message });
         showToast(message, 'success');
+        setCreateForm({
+          sessionYear: '',
+          minCGPA: '',
+          minMembers: '',
+          maxMembers: '',
+          minGroups: '',
+          maxGroups: '',
+          numEvaluations: '',
+          defense1Weightage: '',
+          defense2Weightage: '',
+          department: '',
+        });
+        setCreateTouched({});
       })
       .catch((err) => {
         const msg =
@@ -229,13 +245,37 @@ export default function ManageSessions() {
 
   const handleStatusSubmit = (e) => {
     e.preventDefault();
-    setStatusTouched({ sessionYear: true, status: true });
+    setStatusTouched({ sessionYear: true, department: true, status: true });
     const sessionErr = validateSessionYear(statusForm.sessionYear);
-    if (sessionErr) {
-      setStatusSubmitMessage({ type: 'error', text: sessionErr });
+    const deptErr = statusForm.department ? null : 'Please select a department.';
+    if (sessionErr || deptErr) {
+      setStatusSubmitMessage({ type: 'error', text: sessionErr || deptErr });
       return;
     }
-    setStatusSubmitMessage({ type: 'success', text: 'Change status form ready (API not connected yet).' });
+    setStatusSubmitting(true);
+    setStatusSubmitMessage({ type: '', text: '' });
+    const payload = {
+      sessionYear: statusForm.sessionYear.trim(),
+      department: statusForm.department,
+      status: statusForm.status,
+    };
+    api
+      .post('/api/admins/update-session', payload)
+      .then((res) => {
+        const message = res.data?.message || 'Status updated successfully.';
+        setStatusSubmitMessage({ type: 'success', text: message });
+        showToast(message, 'success');
+      })
+      .catch((err) => {
+        const msg =
+          err.response?.data?.message ||
+          (Array.isArray(err.response?.data?.errors) ? err.response.data.errors.join(' ') : null) ||
+          err.message ||
+          'Failed to update status.';
+        setStatusSubmitMessage({ type: 'error', text: msg });
+        showToast(msg, 'error');
+      })
+      .finally(() => setStatusSubmitting(false));
   };
 
   const handleDeleteSubmit = (e) => {
@@ -498,6 +538,21 @@ export default function ManageSessions() {
                 aria-invalid={!!statusErrors.sessionYear}
               />
             </Field>
+            <Field id="status-department" label="Department" error={statusErrors.department}>
+              <select
+                id="status-department"
+                value={statusForm.department}
+                onChange={(e) => setStatus('department', e.target.value)}
+                onBlur={() => setStatusTouched((t) => ({ ...t, department: true }))}
+                className={statusErrors.department ? inputErrorClass : inputClass}
+                aria-invalid={!!statusErrors.department}
+              >
+                <option value="">Select department</option>
+                {DEPARTMENTS.map((d) => (
+                  <option key={d} value={d}>{d}</option>
+                ))}
+              </select>
+            </Field>
             <Field id="status-value" label="New status">
               <select
                 id="status-value"
@@ -520,9 +575,10 @@ export default function ManageSessions() {
             )}
             <button
               type="submit"
-              className="w-full sm:w-auto px-5 py-2.5 rounded-lg font-medium bg-amber-600 text-white hover:bg-amber-700 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2 transition-colors"
+              disabled={statusSubmitting}
+              className="w-full sm:w-auto px-5 py-2.5 rounded-lg font-medium bg-amber-600 text-white hover:bg-amber-700 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
             >
-              Update status
+              {statusSubmitting ? 'Updating…' : 'Update status'}
             </button>
           </form>
         </section>
