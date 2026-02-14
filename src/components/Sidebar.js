@@ -50,19 +50,19 @@ function getInitial(str) {
   return str.slice(0, 2).toUpperCase();
 }
 
-export default function Sidebar() {
+export default function Sidebar({ isOpen = true }) {
   const { user } = useAuth();
   const roleKey = (user?.role || '').toLowerCase();
   const links = sidebarLinks[roleKey] || sidebarLinks.admin;
 
   return (
-    <aside className="w-64 flex-shrink-0 h-screen bg-primary-dark flex flex-col text-white shadow-lg overflow-hidden">
-      <div className="p-5 border-b border-white/10">
-        <h1 className="text-lg font-bold tracking-wide text-white">UOG | FMS</h1>
-        <p className="text-xs text-white/70 mt-0.5">FYP Management System</p>
-      </div>
-
-      <div className="p-4 border-b border-white/10">
+    <aside
+      className={`flex-shrink-0 h-full bg-primary-dark flex flex-col text-white shadow-lg overflow-hidden transition-[width] duration-200 ease-out ${
+        isOpen ? 'w-64' : 'w-0 min-w-0'
+      }`}
+      aria-hidden={!isOpen}
+    >
+      <div className="flex-shrink-0 p-4 border-b border-white/10">
         <div className="flex items-center gap-3">
           <div className="w-12 h-12 rounded-full bg-accent flex items-center justify-center text-white font-semibold text-lg flex-shrink-0">
             {getInitial(user?.fullName || user?.role)}
@@ -74,7 +74,7 @@ export default function Sidebar() {
         </div>
       </div>
 
-      <nav className="flex-1 min-h-0 py-4 px-3 overflow-y-auto">
+      <nav className="flex-1 min-h-0 py-4 px-3 overflow-y-auto overflow-x-hidden">
         <ul className="space-y-0.5">
           {links.map(({ label, path, icon }) => (
             <li key={path}>
@@ -94,8 +94,8 @@ export default function Sidebar() {
         </ul>
       </nav>
 
-      <div className="p-3 border-t border-white/10">
-        <p className="text-xs text-white/60 px-2">FMS v1.0</p>
+      <div className="flex-shrink-0 mt-auto p-3 border-t border-white/10">
+        <p className="text-xs text-white/60 px-2 whitespace-nowrap">FMS v1.0</p>
       </div>
     </aside>
   );
