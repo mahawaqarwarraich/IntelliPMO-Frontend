@@ -1,4 +1,5 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useRef } from 'react';
+import { api } from '../../api/client';
 
 const DEPARTMENTS = ['CS', 'IT', 'SE'];
 const SESSION_YEAR_REGEX = /^\d{4}-\d{4}$/;
@@ -69,6 +70,18 @@ export default function ManageSessions() {
   });
   const [createTouched, setCreateTouched] = useState({});
   const [createSubmitMessage, setCreateSubmitMessage] = useState({ type: '', text: '' });
+  const [createSubmitting, setCreateSubmitting] = useState(false);
+  const [toast, setToast] = useState({ show: false, message: '', type: 'success' });
+  const toastTimerRef = useRef(null);
+
+  const showToast = useCallback((message, type = 'success') => {
+    if (toastTimerRef.current) clearTimeout(toastTimerRef.current);
+    setToast({ show: true, message, type });
+    toastTimerRef.current = setTimeout(() => {
+      setToast((t) => ({ ...t, show: false }));
+      toastTimerRef.current = null;
+    }, 5000);
+  }, []);
 
   const [statusForm, setStatusForm] = useState({ sessionYear: '', status: 'active' });
   const [statusTouched, setStatusTouched] = useState({});
@@ -181,7 +194,38 @@ export default function ManageSessions() {
       setCreateSubmitMessage({ type: 'error', text: 'Please fix the errors below.' });
       return;
     }
-    setCreateSubmitMessage({ type: 'success', text: 'Create/Update form ready (API not connected yet).' });
+    setCreateSubmitting(true);
+    setCreateSubmitMessage({ type: '', text: '' });
+    const payload = {
+      sessionYear: createForm.sessionYear.trim(),
+      department: createForm.department,
+      status: createForm.status,
+      minCGPA: Number(createForm.minCGPA),
+      minMembers: Number(createForm.minMembers),
+      maxMembers: Number(createForm.maxMembers),
+      minGroups: Number(createForm.minGroups),
+      maxGroups: Number(createForm.maxGroups),
+      numEvaluations: Number(createForm.numEvaluations),
+      defense1Weightage: Number(createForm.defense1Weightage),
+      defense2Weightage: Number(createForm.defense2Weightage),
+    };
+    api
+      .post('/api/admins/save-session', payload)
+      .then((res) => {
+        const message = res.data?.message || 'Session saved successfully.';
+        setCreateSubmitMessage({ type: 'success', text: message });
+        showToast(message, 'success');
+      })
+      .catch((err) => {
+        const msg =
+          err.response?.data?.message ||
+          (Array.isArray(err.response?.data?.errors) ? err.response.data.errors.join(' ') : null) ||
+          err.message ||
+          'Failed to save session.';
+        setCreateSubmitMessage({ type: 'error', text: msg });
+        showToast(msg, 'error');
+      })
+      .finally(() => setCreateSubmitting(false));
   };
 
   const handleStatusSubmit = (e) => {
@@ -209,6 +253,26 @@ export default function ManageSessions() {
 
   return (
     <div className="max-w-4xl mx-auto space-y-8 sm:space-y-10">
+      {toast.show && (
+        <div
+          style={{ animation: 'toast-fade-in 0.25s ease-out' }}
+          className={`fixed top-4 left-1/2 -translate-x-1/2 z-50 max-w-md w-[calc(100%-2rem)] px-4 py-3 rounded-lg shadow-lg text-white text-sm font-medium flex items-center gap-2 ${
+            toast.type === 'success' ? 'bg-green-600' : 'bg-red-600'
+          }`}
+          role="alert"
+        >
+          {toast.type === 'success' ? (
+            <svg className="w-5 h-5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
+              <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+            </svg>
+          ) : (
+            <svg className="w-5 h-5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
+              <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+            </svg>
+          )}
+          <span>{toast.message}</span>
+        </div>
+      )}
       <header>
         <h1 className="text-2xl sm:text-3xl font-bold text-primary-dark tracking-tight">
           Manage FYP Sessions
@@ -401,9 +465,10 @@ export default function ManageSessions() {
           <div className="mt-5 flex flex-wrap gap-3">
             <button
               type="submit"
-              className="px-5 py-2.5 rounded-lg font-medium bg-accent text-white hover:bg-accent-hover focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2 transition-colors"
+              disabled={createSubmitting}
+              className="px-5 py-2.5 rounded-lg font-medium bg-accent text-white hover:bg-accent-hover focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
             >
-              Save session
+              {createSubmitting ? 'Saving…' : 'Save session'}
             </button>
           </div>
         </form>
