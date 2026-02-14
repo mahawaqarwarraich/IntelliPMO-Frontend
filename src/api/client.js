@@ -22,9 +22,12 @@ api.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
-      localStorage.removeItem(TOKEN_KEY);
-      localStorage.removeItem(AUTH_USER_KEY);
-      window.location.href = '/';
+      const isLoginRequest = /\/login\s*$/.test(error.config?.url || '');
+      if (!isLoginRequest) {
+        localStorage.removeItem(TOKEN_KEY);
+        localStorage.removeItem(AUTH_USER_KEY);
+        window.location.href = '/';
+      }
     }
     return Promise.reject(error);
   }

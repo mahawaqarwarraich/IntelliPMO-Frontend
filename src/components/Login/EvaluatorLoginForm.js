@@ -91,10 +91,14 @@ export default function EvaluatorLoginForm({ onSuccess }) {
     setSubmitting(true);
     try {
       const res = await api.post('/api/evaluators/login', payload);
-      const id = res.data.evaluator?._id;
+      const evaluator = res.data.evaluator;
+      const id = evaluator?._id;
       const token = res.data.token;
+      const fullName = evaluator?.fullName;
+      const department = evaluator?.department;
+      const session = evaluator?.sessionYear;
       if (id && token) {
-        login({ id, token, role: 'Evaluator' });
+        login({ id, token, role: 'Evaluator', fullName, department, session });
       }
       showToast(res.data?.message || 'Logged in successfully.', 'success');
       onSuccess?.(res.data);

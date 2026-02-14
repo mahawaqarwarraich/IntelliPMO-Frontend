@@ -91,10 +91,14 @@ export default function StudentLoginForm({ onSuccess }) {
     setSubmitting(true);
     try {
       const res = await api.post('/api/students/login', payload);
-      const id = res.data.student?._id;
+      const student = res.data.student;
+      const id = student?._id;
       const token = res.data.token;
+      const fullName = student?.fullName;
+      const department = student?.department;
+      const session = student?.sessionYear;
       if (id && token) {
-        login({ id, token, role: 'Student' });
+        login({ id, token, role: 'Student', fullName, department, session });
       }
       showToast(res.data?.message || 'Logged in successfully.', 'success');
       onSuccess?.(res.data);

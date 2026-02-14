@@ -91,10 +91,14 @@ export default function SupervisorLoginForm({ onSuccess }) {
     setSubmitting(true);
     try {
       const res = await api.post('/api/supervisors/login', payload);
-      const id = res.data.supervisor?._id;
+      const supervisor = res.data.supervisor;
+      const id = supervisor?._id;
       const token = res.data.token;
+      const fullName = supervisor?.fullName;
+      const department = supervisor?.department;
+      const session = supervisor?.sessionYear;
       if (id && token) {
-        login({ id, token, role: 'Supervisor' });
+        login({ id, token, role: 'Supervisor', fullName, department, session });
       }
       showToast(res.data?.message || 'Logged in successfully.', 'success');
       onSuccess?.(res.data);

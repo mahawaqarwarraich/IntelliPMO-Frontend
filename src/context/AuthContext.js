@@ -16,7 +16,14 @@ export function AuthProvider({ children }) {
       if (saved) {
         const parsed = JSON.parse(saved);
         if (parsed && parsed.id && parsed.token && parsed.role) {
-          setUserState(parsed);
+          setUserState({
+            id: parsed.id,
+            token: parsed.token,
+            role: parsed.role,
+            fullName: parsed.fullName || null,
+            department: parsed.department || null,
+            session: parsed.session || null,
+          });
           localStorage.setItem(TOKEN_KEY, parsed.token);
         }
       }
@@ -28,9 +35,16 @@ export function AuthProvider({ children }) {
   }, []);
 
   const login = (userData) => {
-    const { id, token, role } = userData;
+    const { id, token, role, fullName, department, session } = userData;
     if (!id || !token || !role) return;
-    const u = { id, token, role };
+    const u = {
+      id,
+      token,
+      role,
+      fullName: fullName || null,
+      department: department || null,
+      session: session || null,
+    };
     setUserState(u);
     localStorage.setItem(AUTH_USER_KEY, JSON.stringify(u));
     localStorage.setItem(TOKEN_KEY, token);

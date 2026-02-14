@@ -91,14 +91,18 @@ export default function AdminLoginForm({ onSuccess }) {
     setSubmitting(true);
     try {
       const res = await api.post('/api/admins/login', payload);
-      const id = res.data.admin?._id;
+      const admin = res.data.admin;
+      const id = admin?._id;
       const token = res.data.token;
+      const fullName = admin?.fullName;
+      const department = admin?.department;
+      const session = admin?.sessionYear;
       if (id && token) {
-        login({ id, token, role: 'Admin' });
+        login({ id, token, role: 'Admin', fullName, department, session });
       }
       showToast(res.data?.message || 'Logged in successfully.', 'success');
       onSuccess?.(res.data);
-      setTimeout(() => navigate('/home'), 1500);
+      setTimeout(() => navigate('/dashboard'), 1500);
     } catch (err) {
       const data = err.response?.data;
       const message =
@@ -106,6 +110,7 @@ export default function AdminLoginForm({ onSuccess }) {
         (Array.isArray(data?.errors) ? data.errors.join(' ') : err.message) ||
         'Login failed. Please check your email and password.';
       showToast(message, 'error');
+     
     } finally {
       setSubmitting(false);
     }
