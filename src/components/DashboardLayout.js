@@ -7,11 +7,10 @@ import Sidebar from './Sidebar';
  */
 export default function DashboardLayout() {
   return (
-    <div className="flex min-h-screen bg-gray-50">
+    <div className="flex h-screen min-h-0 bg-gray-50 overflow-hidden">
       <Sidebar />
-      <main className="flex-1 min-w-0 overflow-auto">
+      <main className="flex-1 min-w-0 min-h-0 overflow-y-auto overflow-x-hidden">
         <div className="p-6 sm:p-8">
-          <h1>Dashboard</h1>
           <Outlet />
         </div>
       </main>

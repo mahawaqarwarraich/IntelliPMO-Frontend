@@ -7,6 +7,7 @@ import SupervisorLoginForm from './components/Login/SupervisorLoginForm';
 import EvaluatorLoginForm from './components/Login/EvaluatorLoginForm';
 import DashboardLayout from './components/DashboardLayout';
 import DashboardPlaceholder from './components/DashboardPlaceholder';
+import ManageSessions from './components/admin/ManageSessions';
 import ProtectedRoute from './components/ProtectedRoute';
 
 function App() {
@@ -19,7 +20,7 @@ function App() {
       <Route path="/evaluator-login" element={<EvaluatorLoginForm />} />
 
       <Route path="/dashboard" element={<DashboardLayout />}>
-        <Route path="admin/manage-sessions" element={<DashboardPlaceholder />} />
+        <Route path="admin/manage-sessions" element={<ManageSessions />} />
         <Route path="admin/manage-events" element={<DashboardPlaceholder />} />
         <Route path="admin/manage-students" element={<DashboardPlaceholder />} />
         <Route path="admin/manage-supervisors" element={<DashboardPlaceholder />} />
