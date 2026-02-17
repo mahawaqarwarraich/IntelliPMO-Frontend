@@ -11,11 +11,10 @@ function getInitial(str) {
 
 function getNavbarCenterPaths(role) {
   const r = (role || 'admin').toLowerCase();
-  const base = `/dashboard/${r}`;
   return [
-    { label: 'FYP Guide', path: r === 'student' ? `${base}/fyp-guide` : `${base}/session-policy` },
-    { label: 'FYP Events', path: `${base}/fyp-events` },
-    { label: 'FYP Resources', path: `${base}/fyp-resources` },
+    { label: 'FYP Guide', path: r === 'student' ? '/dashboard/fyp-guide' : '/dashboard/session-policy' },
+    { label: 'FYP Events', path: '/dashboard/fyp-events' },
+    { label: 'FYP Resources', path: '/dashboard/fyp-resources' },
   ];
 }
 

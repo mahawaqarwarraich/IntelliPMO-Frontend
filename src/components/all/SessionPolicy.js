@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import { useAuth } from '../../context/AuthContext';
 import { api } from '../../api/client';
 
 const labelClass = 'text-sm font-medium text-gray-500';
@@ -26,42 +25,37 @@ function PolicyCard({ title, children, className = '' }) {
 }
 
 export default function SessionPolicy() {
-  const { user } = useAuth();
   const [session, setSession] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  const year = user?.session;
-
   useEffect(() => {
-    if (!year) {
-      setLoading(false);
-      setError('Your session is not set. You cannot view session policy.');
-      return;
-    }
-
     let cancelled = false;
     setLoading(true);
     setError(null);
 
     api
-      .get('/api/session-policy', { params: { year } })
+      .get('/api/sessions/active')
       .then((res) => {
-        if (!cancelled) {
-          setSession(res.data?.session ?? null);
-          setError(null);
+        if (cancelled) return;
+        const activeSession = res.data?.activeSession;
+        if (!activeSession) {
+          setError('No active session found.');
+          setSession(null);
+          return;
         }
+        setSession(activeSession);
+        setError(null);
       })
       .catch((err) => {
-        if (!cancelled) {
-          const msg =
-            err.response?.data?.message ||
-            (Array.isArray(err.response?.data?.errors) ? err.response.data.errors.join(' ') : null) ||
-            err.message ||
-            'Failed to load session policy.';
-          setError(msg);
-          setSession(null);
-        }
+        if (cancelled) return;
+        const msg =
+          err.response?.data?.message ||
+          (Array.isArray(err.response?.data?.errors) ? err.response.data.errors.join(' ') : null) ||
+          err.message ||
+          'Failed to load session policy.';
+        setError(msg);
+        setSession(null);
       })
       .finally(() => {
         if (!cancelled) setLoading(false);
@@ -70,7 +64,7 @@ export default function SessionPolicy() {
     return () => {
       cancelled = true;
     };
-  }, [year]);
+  }, []);
 
   if (loading) {
     return (
@@ -136,7 +130,7 @@ export default function SessionPolicy() {
           Session Policy
         </h1>
         <p className="text-gray-600 mt-1 text-sm sm:text-base">
-          Rules and settings for your FYP session ({session.year}).
+          Rules and settings for your FYP session {session.year}.
         </p>
       </header>
 

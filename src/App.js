@@ -11,6 +11,7 @@ import ManageSessions from './components/admin/ManageSessions';
 import ManageDomains from './components/admin/ManageDomains';
 import SessionPolicy from './components/all/SessionPolicy';
 import AllDomains from './components/all/AllDomains';
+import DomainsSupervisors from './components/all/DomainsSupervisors';
 import ProtectedRoute from './components/ProtectedRoute';
 
 function App() {
@@ -23,62 +24,36 @@ function App() {
       <Route path="/evaluator-login" element={<EvaluatorLoginForm />} />
 
       <Route path="/dashboard" element={<DashboardLayout />}>
-        <Route path="admin/manage-sessions" element={<ManageSessions />} />
-        <Route path="admin/manage-events" element={<DashboardPlaceholder />} />
-        <Route path="admin/manage-students" element={<DashboardPlaceholder />} />
-        <Route path="admin/manage-supervisors" element={<DashboardPlaceholder />} />
-        <Route path="admin/manage-evaluators" element={<DashboardPlaceholder />} />
-        <Route path="admin/manage-domains" element={<ManageDomains />} />
-        <Route path="admin/evaluator-panels" element={<DashboardPlaceholder />} />
-        <Route path="admin/all-sessions" element={<DashboardPlaceholder />} />
-        <Route path="admin/all-domains" element={<AllDomains />} />
-        <Route path="admin/all-supervisors" element={<DashboardPlaceholder />} />
-        <Route path="admin/all-evaluators" element={<DashboardPlaceholder />} />
-        <Route path="admin/groups-defense1" element={<DashboardPlaceholder />} />
-        <Route path="admin/groups-defense2" element={<DashboardPlaceholder />} />
-        <Route path="admin/domains-supervisors" element={<DashboardPlaceholder />} />
-        <Route path="admin/session-policy" element={<SessionPolicy />} />
-        <Route path="admin/fyp-resources" element={<DashboardPlaceholder />} />
-        <Route path="admin/fyp-events" element={<DashboardPlaceholder />} />
-        <Route path="admin/previous-fyps" element={<DashboardPlaceholder />} />
-        <Route path="admin/supervisor-allocation" element={<DashboardPlaceholder />} />
-        <Route path="admin/group-requests" element={<DashboardPlaceholder />} />
-        <Route path="admin/give-marks" element={<DashboardPlaceholder />} />
-        <Route path="student/chat-homes" element={<DashboardPlaceholder />} />
-        <Route path="student/all-domains" element={<AllDomains />} />
-        <Route path="student/domains-supervisors" element={<DashboardPlaceholder />} />
-        <Route path="student/session-policy" element={<SessionPolicy />} />
-        <Route path="student/fyp-resources" element={<DashboardPlaceholder />} />
-        <Route path="student/fyp-events" element={<DashboardPlaceholder />} />
-        <Route path="student/previous-fyps" element={<DashboardPlaceholder />} />
-        <Route path="student/register-group" element={<DashboardPlaceholder />} />
-        <Route path="student/request-status" element={<DashboardPlaceholder />} />
-        <Route path="student/fyp-guide" element={<DashboardPlaceholder />} />
-        <Route path="student/meetings" element={<DashboardPlaceholder />} />
-        <Route path="student/supervisor-allocation" element={<DashboardPlaceholder />} />
-        <Route path="student/groups-defense1" element={<DashboardPlaceholder />} />
-        <Route path="student/groups-defense2" element={<DashboardPlaceholder />} />
-        <Route path="supervisor/all-domains" element={<AllDomains />} />
-        <Route path="supervisor/domains-supervisors" element={<DashboardPlaceholder />} />
-        <Route path="supervisor/session-policy" element={<SessionPolicy />} />
-        <Route path="supervisor/fyp-resources" element={<DashboardPlaceholder />} />
-        <Route path="supervisor/fyp-events" element={<DashboardPlaceholder />} />
-        <Route path="supervisor/create-meeting" element={<DashboardPlaceholder />} />
-        <Route path="supervisor/all-meetings" element={<DashboardPlaceholder />} />
-        <Route path="supervisor/allocation-status" element={<DashboardPlaceholder />} />
-        <Route path="supervisor/group-requests" element={<DashboardPlaceholder />} />
-        <Route path="supervisor/groups-defense1" element={<DashboardPlaceholder />} />
-        <Route path="supervisor/groups-defense2" element={<DashboardPlaceholder />} />
-        <Route path="supervisor/give-marks" element={<DashboardPlaceholder />} />
-        <Route path="evaluator/all-domains" element={<AllDomains />} />
-        <Route path="evaluator/domains-supervisors" element={<DashboardPlaceholder />} />
-        <Route path="evaluator/session-policy" element={<SessionPolicy />} />
-        <Route path="evaluator/fyp-resources" element={<DashboardPlaceholder />} />
-        <Route path="evaluator/fyp-events" element={<DashboardPlaceholder />} />
-        <Route path="evaluator/groups-defense1" element={<DashboardPlaceholder />} />
-        <Route path="evaluator/groups-defense2" element={<DashboardPlaceholder />} />
-        <Route path="evaluator/assigned-groups" element={<DashboardPlaceholder />} />
-        <Route path="evaluator/give-marks" element={<DashboardPlaceholder />} />
+        <Route path="manage-sessions" element={<ManageSessions />} />
+        <Route path="manage-events" element={<DashboardPlaceholder />} />
+        <Route path="manage-students" element={<DashboardPlaceholder />} />
+        <Route path="manage-supervisors" element={<DashboardPlaceholder />} />
+        <Route path="manage-evaluators" element={<DashboardPlaceholder />} />
+        <Route path="manage-domains" element={<ManageDomains />} />
+        <Route path="evaluator-panels" element={<DashboardPlaceholder />} />
+        <Route path="all-sessions" element={<DashboardPlaceholder />} />
+        <Route path="all-domains" element={<AllDomains />} />
+        <Route path="all-supervisors" element={<DashboardPlaceholder />} />
+        <Route path="all-evaluators" element={<DashboardPlaceholder />} />
+        <Route path="groups-defense1" element={<DashboardPlaceholder />} />
+        <Route path="groups-defense2" element={<DashboardPlaceholder />} />
+        <Route path="domains-supervisors" element={<DomainsSupervisors />} />
+        <Route path="session-policy" element={<SessionPolicy />} />
+        <Route path="fyp-resources" element={<DashboardPlaceholder />} />
+        <Route path="fyp-events" element={<DashboardPlaceholder />} />
+        <Route path="previous-fyps" element={<DashboardPlaceholder />} />
+        <Route path="supervisor-allocation" element={<DashboardPlaceholder />} />
+        <Route path="group-requests" element={<DashboardPlaceholder />} />
+        <Route path="give-marks" element={<DashboardPlaceholder />} />
+        <Route path="chat-homes" element={<DashboardPlaceholder />} />
+        <Route path="register-group" element={<DashboardPlaceholder />} />
+        <Route path="request-status" element={<DashboardPlaceholder />} />
+        <Route path="fyp-guide" element={<DashboardPlaceholder />} />
+        <Route path="meetings" element={<DashboardPlaceholder />} />
+        <Route path="create-meeting" element={<DashboardPlaceholder />} />
+        <Route path="all-meetings" element={<DashboardPlaceholder />} />
+        <Route path="allocation-status" element={<DashboardPlaceholder />} />
+        <Route path="assigned-groups" element={<DashboardPlaceholder />} />
       </Route>
 
       <Route path="/home" element={<Navigate to="/dashboard" replace />} />
