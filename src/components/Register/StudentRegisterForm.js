@@ -2,11 +2,8 @@ import { useState, useRef, useEffect, useCallback } from 'react';
 import StudentLoginForm from '../Login/StudentLoginForm';
 import { api } from '../../api/client.js';
 
-const DEPARTMENTS = ['IT', 'CS', 'SE'];
-
 const FIELD_NAMES = [
   'fullName',
-  'department',
   'rollNo',
   'cgpa',
   'email',
@@ -22,7 +19,6 @@ const MIN_FULLNAME_LENGTH = 2;
 const MAX_FULLNAME_LENGTH = 100;
 const STUDENT_EMAIL_REGEX = /^\d{8}-\d{3}@uog\.edu\.pk$/i;
 const ROLL_NO_REGEX = /^\d{8}-\d{3}$/;
-const SESSION_REGEX = /^\d{4}-\d{4}$/;
 const FULLNAME_REGEX = /^[\p{L}\s\-'.]+$/u;
 
 function validateField(field, values, touchedState) {
@@ -40,8 +36,6 @@ function validateField(field, values, touchedState) {
       if (val.length > MAX_FULLNAME_LENGTH) return 'Name is too long.';
       if (!FULLNAME_REGEX.test(val)) return 'Use only letters, spaces, hyphens.';
       return null;
-    case 'department':
-      return null;
     case 'email':
       if (!STUDENT_EMAIL_REGEX.test(val)) {
         return 'Email must be like 21011519-085@uog.edu.pk (8 digits, hyphen, 3 digits).';
@@ -55,8 +49,7 @@ function validateField(field, values, touchedState) {
       if (!ROLL_NO_REGEX.test(val)) return 'Roll number must be like 21011519-085 (8 digits, hyphen, 3 digits).';
       return null;
     case 'session':
-      if (!SESSION_REGEX.test(val)) return 'Session must be like 2021-2025 (year-year).';
-      return null;
+      return null; // value is session id from dropdown
     case 'cgpa': {
       const num = parseFloat(val);
       if (Number.isNaN(num)) return 'Enter a valid number (0 to 4).';
@@ -82,8 +75,26 @@ export default function StudentRegisterForm({ onBack, onSubmit, onLogin }) {
   const [submitError, setSubmitError] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [toast, setToast] = useState({ show: false, message: '', type: 'success' });
+  const [activeSessions, setActiveSessions] = useState([]);
+  const [sessionsLoading, setSessionsLoading] = useState(true);
   const toastTimerRef = useRef(null);
   const firstErrorIdRef = useRef(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    api
+      .get('/api/sessions', { params: { status: 'active' } })
+      .then((res) => {
+        if (!cancelled && Array.isArray(res.data?.sessions)) setActiveSessions(res.data.sessions);
+      })
+      .catch(() => {
+        if (!cancelled) setActiveSessions([]);
+      })
+      .finally(() => {
+        if (!cancelled) setSessionsLoading(false);
+      });
+    return () => { cancelled = true; };
+  }, []);
 
   const showToast = useCallback((message, type = 'success') => {
     if (toastTimerRef.current) clearTimeout(toastTimerRef.current);
@@ -127,6 +138,8 @@ export default function StudentRegisterForm({ onBack, onSubmit, onLogin }) {
 
     const payload = { ...values };
     delete payload.confirmPassword;
+    payload.session_id = payload.session;
+    delete payload.session;
 
     setSubmitting(true);
     try {
@@ -148,7 +161,6 @@ export default function StudentRegisterForm({ onBack, onSubmit, onLogin }) {
   };
 
   const fullNameError = getError({ name: 'fullName' }, touched);
-  const departmentError = getError({ name: 'department' }, touched);
   const rollNoError = getError({ name: 'rollNo' }, touched);
   const cgpaError = getError({ name: 'cgpa' }, touched);
   const emailError = getError({ name: 'email' }, touched);
@@ -228,35 +240,6 @@ export default function StudentRegisterForm({ onBack, onSubmit, onLogin }) {
             {fullNameError && (
               <span id="fullName-error" className={errorClass} role="alert">
                 {fullNameError}
-              </span>
-            )}
-          </div>
-
-          <div className={fieldWrapClass}>
-            <label htmlFor="department" className={labelClass}>
-              Department<span className="text-red-500 ml-0.5">*</span>
-            </label>
-            <select
-              id="department"
-              name="department"
-              value={values.department || ''}
-              onChange={handleChange('department')}
-              onBlur={handleBlur('department')}
-              required
-              aria-invalid={!!departmentError}
-              aria-describedby={departmentError ? 'department-error' : undefined}
-              className={selectClass}
-            >
-              <option value="">Select department</option>
-              {DEPARTMENTS.map((opt) => (
-                <option key={opt} value={opt}>
-                  {opt}
-                </option>
-              ))}
-            </select>
-            {departmentError && (
-              <span id="department-error" className={errorClass} role="alert">
-                {departmentError}
               </span>
             )}
           </div>
@@ -390,19 +373,25 @@ export default function StudentRegisterForm({ onBack, onSubmit, onLogin }) {
             <label htmlFor="session" className={labelClass}>
               Session<span className="text-red-500 ml-0.5">*</span>
             </label>
-            <input
+            <select
               id="session"
               name="session"
-              type="text"
-              placeholder="e.g. 2021-2025"
               value={values.session ?? ''}
               onChange={handleChange('session')}
               onBlur={handleBlur('session')}
               required
+              disabled={sessionsLoading}
               aria-invalid={!!sessionError}
               aria-describedby={sessionError ? 'session-error' : undefined}
-              className={inputClass}
-            />
+              className={selectClass}
+            >
+              <option value="">{sessionsLoading ? 'Loading…' : 'Select session'}</option>
+              {activeSessions.map((s) => (
+                <option key={s._id} value={s._id}>
+                  {s.year}
+                </option>
+              ))}
+            </select>
             {sessionError && (
               <span id="session-error" className={errorClass} role="alert">
                 {sessionError}

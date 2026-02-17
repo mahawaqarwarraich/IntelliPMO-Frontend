@@ -1,7 +1,6 @@
 import { useState, useCallback, useRef } from 'react';
 import { api } from '../../api/client';
 
-const DEPARTMENTS = ['CS', 'IT', 'SE'];
 const SESSION_YEAR_REGEX = /^\d{4}-\d{4}$/;
 const STATUS_OPTIONS = [
   { value: 'draft', label: 'Draft' },
@@ -66,7 +65,6 @@ export default function ManageSessions() {
     numEvaluations: '',
     defense1Weightage: '',
     defense2Weightage: '',
-    department: '',
   });
   const [createTouched, setCreateTouched] = useState({});
   const [createSubmitMessage, setCreateSubmitMessage] = useState({ type: '', text: '' });
@@ -83,7 +81,7 @@ export default function ManageSessions() {
     }, 5000);
   }, []);
 
-  const [statusForm, setStatusForm] = useState({ sessionYear: '', department: '', status: 'active' });
+  const [statusForm, setStatusForm] = useState({ sessionYear: '', status: 'active' });
   const [statusTouched, setStatusTouched] = useState({});
   const [statusSubmitMessage, setStatusSubmitMessage] = useState({ type: '', text: '' });
   const [statusSubmitting, setStatusSubmitting] = useState(false);
@@ -138,13 +136,11 @@ export default function ManageSessions() {
     defense2Weightage: createTouched.defense2Weightage
       ? validateNumber(createForm.defense2Weightage, { min: 0, max: 100, label: 'Defense 2 weightage' })
       : null,
-    department: createTouched.department ? (createForm.department ? null : 'Please select a department.') : null,
   };
   const createValid = !Object.values(createErrors).some(Boolean);
 
   const statusErrors = {
     sessionYear: validateSessionYear(statusForm.sessionYear),
-    department: statusTouched.department ? (statusForm.department ? null : 'Please select a department.') : null,
   };
   const statusValid = !Object.values(statusErrors).some(Boolean);
 
@@ -176,7 +172,6 @@ export default function ManageSessions() {
       numEvaluations: validateNumber(createForm.numEvaluations, { min: 0, integer: true, label: 'Number of evaluations' }),
       defense1Weightage: validateNumber(createForm.defense1Weightage, { min: 0, max: 100, label: 'Defense 1 weightage' }),
       defense2Weightage: validateNumber(createForm.defense2Weightage, { min: 0, max: 100, label: 'Defense 2 weightage' }),
-      department: createForm.department ? null : 'Please select a department.',
     };
     if (Object.values(errs).some(Boolean)) {
       setCreateSubmitMessage({ type: 'error', text: 'Please fix the errors below.' });
@@ -186,7 +181,6 @@ export default function ManageSessions() {
     setCreateSubmitMessage({ type: '', text: '' });
     const payload = {
       sessionYear: createForm.sessionYear.trim(),
-      department: createForm.department,
       status: 'draft',
       minCGPA: Number(createForm.minCGPA),
       minMembers: Number(createForm.minMembers),
@@ -213,7 +207,6 @@ export default function ManageSessions() {
           numEvaluations: '',
           defense1Weightage: '',
           defense2Weightage: '',
-          department: '',
         });
         setCreateTouched({});
       })
@@ -231,18 +224,16 @@ export default function ManageSessions() {
 
   const handleStatusSubmit = (e) => {
     e.preventDefault();
-    setStatusTouched({ sessionYear: true, department: true, status: true });
+    setStatusTouched({ sessionYear: true, status: true });
     const sessionErr = validateSessionYear(statusForm.sessionYear);
-    const deptErr = statusForm.department ? null : 'Please select a department.';
-    if (sessionErr || deptErr) {
-      setStatusSubmitMessage({ type: 'error', text: sessionErr || deptErr });
+    if (sessionErr) {
+      setStatusSubmitMessage({ type: 'error', text: sessionErr });
       return;
     }
     setStatusSubmitting(true);
     setStatusSubmitMessage({ type: '', text: '' });
     const payload = {
       sessionYear: statusForm.sessionYear.trim(),
-      department: statusForm.department,
       status: statusForm.status,
     };
     api
@@ -312,7 +303,7 @@ export default function ManageSessions() {
                 Create or update session
               </h2>
               <p className="text-sm text-gray-600 mt-0.5">
-                Set session year, group rules, weightages, and department.
+                Set session year and group rules, weightages.
               </p>
             </div>
           </div>
@@ -330,21 +321,6 @@ export default function ManageSessions() {
                 className={createErrors.sessionYear ? inputErrorClass : inputClass}
                 aria-invalid={!!createErrors.sessionYear}
               />
-            </Field>
-            <Field id="create-department" label="Department" error={createErrors.department}>
-              <select
-                id="create-department"
-                value={createForm.department}
-                onChange={(e) => setCreate('department', e.target.value)}
-                onBlur={() => setCreateTouched((t) => ({ ...t, department: true }))}
-                className={createErrors.department ? inputErrorClass : inputClass}
-                aria-invalid={!!createErrors.department}
-              >
-                <option value="">Select department</option>
-                {DEPARTMENTS.map((d) => (
-                  <option key={d} value={d}>{d}</option>
-                ))}
-              </select>
             </Field>
             <Field id="create-minCGPA" label="Min CGPA (1–4)" error={createErrors.minCGPA}>
               <input
@@ -492,13 +468,13 @@ export default function ManageSessions() {
                 Change session status
               </h2>
               <p className="text-sm text-gray-600 mt-0.5">
-                Set a session to draft, active, or inactive by year and department.
+                Set a session to draft, active, or inactive by year.
               </p>
             </div>
           </div>
         </div>
         <form onSubmit={handleStatusSubmit} className="p-5 sm:p-6">
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-5">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5">
             <Field id="status-year" label="Session year (e.g. 2021-2025)" error={statusErrors.sessionYear}>
               <input
                 id="status-year"
@@ -510,21 +486,6 @@ export default function ManageSessions() {
                 className={statusErrors.sessionYear ? inputErrorClass : inputClass}
                 aria-invalid={!!statusErrors.sessionYear}
               />
-            </Field>
-            <Field id="status-department" label="Department" error={statusErrors.department}>
-              <select
-                id="status-department"
-                value={statusForm.department}
-                onChange={(e) => setStatus('department', e.target.value)}
-                onBlur={() => setStatusTouched((t) => ({ ...t, department: true }))}
-                className={statusErrors.department ? inputErrorClass : inputClass}
-                aria-invalid={!!statusErrors.department}
-              >
-                <option value="">Select department</option>
-                {DEPARTMENTS.map((d) => (
-                  <option key={d} value={d}>{d}</option>
-                ))}
-              </select>
             </Field>
             <Field id="status-value" label="New status">
               <select

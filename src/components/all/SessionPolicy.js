@@ -31,13 +31,12 @@ export default function SessionPolicy() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  const department = user?.department;
   const year = user?.session;
 
   useEffect(() => {
-    if (!department || !year) {
+    if (!year) {
       setLoading(false);
-      setError('Your department or session is not set. You cannot view session policy.');
+      setError('Your session is not set. You cannot view session policy.');
       return;
     }
 
@@ -46,7 +45,7 @@ export default function SessionPolicy() {
     setError(null);
 
     api
-      .get('/api/session-policy', { params: { department, year } })
+      .get('/api/session-policy', { params: { year } })
       .then((res) => {
         if (!cancelled) {
           setSession(res.data?.session ?? null);
@@ -71,7 +70,7 @@ export default function SessionPolicy() {
     return () => {
       cancelled = true;
     };
-  }, [department, year]);
+  }, [year]);
 
   if (loading) {
     return (
@@ -122,7 +121,7 @@ export default function SessionPolicy() {
           </p>
         </header>
         <div className="rounded-2xl border border-gray-200 bg-white shadow-sm p-8 text-center">
-          <p className="text-gray-600">No session policy found for your department and session.</p>
+          <p className="text-gray-600">No session policy found for your session.</p>
         </div>
       </div>
     );
@@ -137,14 +136,13 @@ export default function SessionPolicy() {
           Session Policy
         </h1>
         <p className="text-gray-600 mt-1 text-sm sm:text-base">
-          Rules and settings for your FYP session ({session.year}, {session.department}).
+          Rules and settings for your FYP session ({session.year}).
         </p>
       </header>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <PolicyCard title="Session details">
           <PolicyRow label="Session year" value={session.year} />
-          <PolicyRow label="Department" value={session.department} />
           <PolicyRow label="Status" value={statusLabel} />
         </PolicyCard>
 

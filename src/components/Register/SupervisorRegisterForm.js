@@ -1,11 +1,8 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { api } from '../../api/client.js';
 
-const DEPARTMENTS = ['IT', 'CS', 'SE'];
-
 const FIELD_NAMES = [
   'fullName',
-  'department',
   'email',
   'password',
   'confirmPassword',
@@ -19,7 +16,6 @@ const INITIAL_VALUES = Object.fromEntries(FIELD_NAMES.map((name) => [name, '']))
 const MIN_PASSWORD_LENGTH = 6;
 const MIN_FULLNAME_LENGTH = 2;
 const MAX_FULLNAME_LENGTH = 100;
-const SESSION_REGEX = /^\d{4}-\d{4}$/;
 const FULLNAME_REGEX = /^[\p{L}\s\-'.]+$/u;
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -38,8 +34,6 @@ function validateField(field, values, touchedState) {
       if (val.length > MAX_FULLNAME_LENGTH) return 'Name is too long.';
       if (!FULLNAME_REGEX.test(val)) return 'Use only letters, spaces, hyphens.';
       return null;
-    case 'department':
-      return null;
     case 'email':
       if (!EMAIL_REGEX.test(val)) return 'Enter a valid email address.';
       if (val.split('@')[1]?.toLowerCase() !== 'uog.edu.pk') return 'Email must be from @uog.edu.pk.';
@@ -49,8 +43,7 @@ function validateField(field, values, touchedState) {
     case 'confirmPassword':
       return values.password !== values.confirmPassword ? 'Passwords do not match.' : null;
     case 'session':
-      if (!SESSION_REGEX.test(val)) return 'Session must be like 2021-2025 (year-year).';
-      return null;
+      return null; // value is session id from dropdown
     case 'domain_id':
       return null;
     case 'designation':
@@ -77,6 +70,8 @@ export default function SupervisorRegisterForm({ onBack, onSubmit, onLogin }) {
   const [toast, setToast] = useState({ show: false, message: '', type: 'success' });
   const [domains, setDomains] = useState([]);
   const [domainsLoading, setDomainsLoading] = useState(true);
+  const [activeSessions, setActiveSessions] = useState([]);
+  const [sessionsLoading, setSessionsLoading] = useState(true);
   const toastTimerRef = useRef(null);
   const firstErrorIdRef = useRef(null);
 
@@ -92,6 +87,22 @@ export default function SupervisorRegisterForm({ onBack, onSubmit, onLogin }) {
       })
       .finally(() => {
         if (!cancelled) setDomainsLoading(false);
+      });
+    return () => { cancelled = true; };
+  }, []);
+
+  useEffect(() => {
+    let cancelled = false;
+    api
+      .get('/api/sessions', { params: { status: 'active' } })
+      .then((res) => {
+        if (!cancelled && Array.isArray(res.data?.sessions)) setActiveSessions(res.data.sessions);
+      })
+      .catch(() => {
+        if (!cancelled) setActiveSessions([]);
+      })
+      .finally(() => {
+        if (!cancelled) setSessionsLoading(false);
       });
     return () => { cancelled = true; };
   }, []);
@@ -138,6 +149,8 @@ export default function SupervisorRegisterForm({ onBack, onSubmit, onLogin }) {
 
     const payload = { ...values };
     delete payload.confirmPassword;
+    payload.session_id = payload.session;
+    delete payload.session;
 
     setSubmitting(true);
     try {
@@ -159,7 +172,6 @@ export default function SupervisorRegisterForm({ onBack, onSubmit, onLogin }) {
   };
 
   const fullNameError = getError({ name: 'fullName' }, touched);
-  const departmentError = getError({ name: 'department' }, touched);
   const emailError = getError({ name: 'email' }, touched);
   const passwordError = getError({ name: 'password' }, touched);
   const confirmPasswordError = getError({ name: 'confirmPassword' }, touched);
@@ -244,35 +256,6 @@ export default function SupervisorRegisterForm({ onBack, onSubmit, onLogin }) {
           </div>
 
           <div className={fieldWrapClass}>
-            <label htmlFor="department" className={labelClass}>
-              Department<span className="text-red-500 ml-0.5">*</span>
-            </label>
-            <select
-              id="department"
-              name="department"
-              value={values.department || ''}
-              onChange={handleChange('department')}
-              onBlur={handleBlur('department')}
-              required
-              aria-invalid={!!departmentError}
-              aria-describedby={departmentError ? 'department-error' : undefined}
-              className={selectClass}
-            >
-              <option value="">Select department</option>
-              {DEPARTMENTS.map((opt) => (
-                <option key={opt} value={opt}>
-                  {opt}
-                </option>
-              ))}
-            </select>
-            {departmentError && (
-              <span id="department-error" className={errorClass} role="alert">
-                {departmentError}
-              </span>
-            )}
-          </div>
-
-          <div className={fieldWrapClass}>
             <label htmlFor="email" className={labelClass}>
               University email<span className="text-red-500 ml-0.5">*</span>
             </label>
@@ -350,19 +333,25 @@ export default function SupervisorRegisterForm({ onBack, onSubmit, onLogin }) {
             <label htmlFor="session" className={labelClass}>
               Session<span className="text-red-500 ml-0.5">*</span>
             </label>
-            <input
+            <select
               id="session"
               name="session"
-              type="text"
-              placeholder="e.g. 2021-2025"
               value={values.session ?? ''}
               onChange={handleChange('session')}
               onBlur={handleBlur('session')}
               required
+              disabled={sessionsLoading}
               aria-invalid={!!sessionError}
               aria-describedby={sessionError ? 'session-error' : undefined}
-              className={inputClass}
-            />
+              className={selectClass}
+            >
+              <option value="">{sessionsLoading ? 'Loading…' : 'Select session'}</option>
+              {activeSessions.map((s) => (
+                <option key={s._id} value={s._id}>
+                  {s.year}
+                </option>
+              ))}
+            </select>
             {sessionError && (
               <span id="session-error" className={errorClass} role="alert">
                 {sessionError}
