@@ -6,9 +6,13 @@ import AdminLoginForm from './components/Login/AdminLoginForm';
 import SupervisorLoginForm from './components/Login/SupervisorLoginForm';
 import EvaluatorLoginForm from './components/Login/EvaluatorLoginForm';
 import DashboardLayout from './components/DashboardLayout';
+import DashboardHome from './components/DashboardHome';
 import DashboardPlaceholder from './components/DashboardPlaceholder';
 import ManageSessions from './components/admin/ManageSessions';
 import ManageDomains from './components/admin/ManageDomains';
+import ManageStudents from './components/admin/ManageStudents';
+import ManageSupervisors from './components/admin/ManageSupervisors';
+import ManageEvaluators from './components/admin/ManageEvaluators';
 import SessionPolicy from './components/all/SessionPolicy';
 import AllDomains from './components/all/AllDomains';
 import DomainsSupervisors from './components/all/DomainsSupervisors';
@@ -24,11 +28,12 @@ function App() {
       <Route path="/evaluator-login" element={<EvaluatorLoginForm />} />
 
       <Route path="/dashboard" element={<DashboardLayout />}>
+        <Route index element={<DashboardHome />} />
         <Route path="manage-sessions" element={<ManageSessions />} />
         <Route path="manage-events" element={<DashboardPlaceholder />} />
-        <Route path="manage-students" element={<DashboardPlaceholder />} />
-        <Route path="manage-supervisors" element={<DashboardPlaceholder />} />
-        <Route path="manage-evaluators" element={<DashboardPlaceholder />} />
+        <Route path="manage-students" element={<ManageStudents />} />
+        <Route path="manage-supervisors" element={<ManageSupervisors />} />
+        <Route path="manage-evaluators" element={<ManageEvaluators />} />
         <Route path="manage-domains" element={<ManageDomains />} />
         <Route path="evaluator-panels" element={<DashboardPlaceholder />} />
         <Route path="all-sessions" element={<DashboardPlaceholder />} />
