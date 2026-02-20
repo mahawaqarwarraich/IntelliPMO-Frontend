@@ -16,6 +16,7 @@ import ManageEvaluators from './components/admin/ManageEvaluators';
 import SessionPolicy from './components/all/SessionPolicy';
 import AllDomains from './components/all/AllDomains';
 import DomainsSupervisors from './components/all/DomainsSupervisors';
+import RegisterGroup from './components/RegisterGroup';
 import ProtectedRoute from './components/ProtectedRoute';
 
 function App() {
@@ -51,7 +52,7 @@ function App() {
         <Route path="group-requests" element={<DashboardPlaceholder />} />
         <Route path="give-marks" element={<DashboardPlaceholder />} />
         <Route path="chat-homes" element={<DashboardPlaceholder />} />
-        <Route path="register-group" element={<DashboardPlaceholder />} />
+        <Route path="register-group" element={<RegisterGroup />} />
         <Route path="request-status" element={<DashboardPlaceholder />} />
         <Route path="fyp-guide" element={<DashboardPlaceholder />} />
         <Route path="meetings" element={<DashboardPlaceholder />} />

@@ -69,12 +69,15 @@ export default function Navbar({ isSidebarOpen, onToggleSidebar }) {
         >
           {isSidebarOpen ? closeIcon : menuIcon}
         </button>
-        <div className="flex flex-col min-w-0">
+        <NavLink
+          to="/dashboard"
+          className="flex flex-col min-w-0 hover:opacity-80 hover:no-underline transition-opacity focus:outline-none focus:ring-0 rounded px-1 -mx-1 no-underline"
+        >
           <span className="text-base sm:text-lg font-bold text-primary-dark tracking-wide truncate">
             UOG | FMS
           </span>
           <span className="text-[10px] sm:text-xs text-gray-500 truncate">FYP Management System</span>
-        </div>
+        </NavLink>
       </div>
 
       {/* Center: FYP Guide, FYP Events, FYP Resources */}
