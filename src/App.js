@@ -17,6 +17,7 @@ import SessionPolicy from './components/all/SessionPolicy';
 import AllDomains from './components/all/AllDomains';
 import DomainsSupervisors from './components/all/DomainsSupervisors';
 import RegisterGroup from './components/RegisterGroup';
+import GroupStatus from './components/GroupStatus';
 import ProtectedRoute from './components/ProtectedRoute';
 
 function App() {
@@ -53,7 +54,7 @@ function App() {
         <Route path="give-marks" element={<DashboardPlaceholder />} />
         <Route path="chat-homes" element={<DashboardPlaceholder />} />
         <Route path="register-group" element={<RegisterGroup />} />
-        <Route path="request-status" element={<DashboardPlaceholder />} />
+        <Route path="request-status" element={<ProtectedRoute><GroupStatus /></ProtectedRoute>} />
         <Route path="fyp-guide" element={<DashboardPlaceholder />} />
         <Route path="meetings" element={<DashboardPlaceholder />} />
         <Route path="create-meeting" element={<DashboardPlaceholder />} />

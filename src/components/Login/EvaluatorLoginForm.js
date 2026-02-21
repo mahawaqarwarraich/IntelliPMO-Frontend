@@ -96,9 +96,9 @@ export default function EvaluatorLoginForm({ onSuccess }) {
       const token = res.data.token;
       const fullName = evaluator?.fullName;
       const department = evaluator?.department;
-      const session = evaluator?.sessionYear;
+      const sessionId = evaluator?.session_id;
       if (id && token) {
-        login({ id, token, role: 'Evaluator', fullName, department, session });
+        login({ id, token, role: 'Evaluator', fullName, department, sessionId });
       }
       showToast(res.data?.message || 'Logged in successfully.', 'success');
       onSuccess?.(res.data);

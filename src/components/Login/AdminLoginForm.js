@@ -96,9 +96,9 @@ export default function AdminLoginForm({ onSuccess }) {
       const token = res.data.token;
       const fullName = admin?.fullName;
       const department = admin?.department;
-      const session = admin?.sessionYear;
+      const sessionId = admin?.session_id;
       if (id && token) {
-        login({ id, token, role: 'Admin', fullName, department, session });
+        login({ id, token, role: 'Admin', fullName, department, sessionId });
       }
       showToast(res.data?.message || 'Logged in successfully.', 'success');
       onSuccess?.(res.data);

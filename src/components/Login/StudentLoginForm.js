@@ -96,9 +96,9 @@ export default function StudentLoginForm({ onSuccess }) {
       const token = res.data.token;
       const fullName = student?.fullName;
       const department = student?.department;
-      const session = student?.sessionYear;
+      const sessionId = student?.session_id;
       if (id && token) {
-        login({ id, token, role: 'Student', fullName, department, session });
+        login({ id, token, role: 'Student', fullName, department, sessionId });
       }
       showToast(res.data?.message || 'Logged in successfully.', 'success');
       onSuccess?.(res.data);

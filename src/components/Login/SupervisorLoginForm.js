@@ -96,9 +96,9 @@ export default function SupervisorLoginForm({ onSuccess }) {
       const token = res.data.token;
       const fullName = supervisor?.fullName;
       const department = supervisor?.department;
-      const session = supervisor?.sessionYear;
+      const sessionId = supervisor?.session_id;
       if (id && token) {
-        login({ id, token, role: 'Supervisor', fullName, department, session });
+        login({ id, token, role: 'Supervisor', fullName, department, sessionId });
       }
       showToast(res.data?.message || 'Logged in successfully.', 'success');
       onSuccess?.(res.data);
