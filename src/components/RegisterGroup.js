@@ -34,6 +34,8 @@ export default function RegisterGroup() {
   const [ideaName, setIdeaName] = useState('');
   const [ideaDescription, setIdeaDescription] = useState('');
   const [memberIds, setMemberIds] = useState([]);
+  const [memberQueries, setMemberQueries] = useState([]); // roll no / search text per slot
+  const [focusedMemberIndex, setFocusedMemberIndex] = useState(null); // for dropdown visibility
   const [supervisorId, setSupervisorId] = useState('');
 
   useEffect(() => {
@@ -94,24 +96,69 @@ export default function RegisterGroup() {
 
   useEffect(() => {
     if (!sessionActive) return;
+    const len = maxMembers;
     setMemberIds((prev) => {
-      const len = maxMembers;
       if (prev.length === len) return prev;
       const next = Array(len).fill('');
-      prev.forEach((v, i) => {
-        if (i < len) next[i] = v;
-      });
+      prev.forEach((v, i) => { if (i < len) next[i] = v; });
+      return next;
+    });
+    setMemberQueries((prev) => {
+      if (prev.length === len) return prev;
+      const next = Array(len).fill('');
+      prev.forEach((v, i) => { if (i < len) next[i] = v; });
       return next;
     });
   }, [sessionActive, maxMembers]);
 
-  const handleMemberChange = (index, value) => {
-    setMemberIds((prev) => {
+  const getStudentDisplay = (student) =>
+    student ? `${student.rollNo ?? ''} — ${student.fullName ?? '—'}`.trim() || '—' : '—';
+
+  const getFilteredStudentsForSlot = (slotIndex) => {
+    const query = (memberQueries[slotIndex] ?? '').trim().toLowerCase();
+    const otherIds = memberIds.filter((_, i) => i !== slotIndex && memberIds[i]);
+    const excludeSet = new Set(otherIds);
+    if (!query) {
+      return students.filter((s) => !excludeSet.has(s._id));
+    }
+    return students.filter((s) => {
+      if (excludeSet.has(s._id)) return false;
+      const roll = (s.rollNo ?? '').toLowerCase();
+      const name = (s.fullName ?? '').toLowerCase();
+      return roll.includes(query) || name.includes(query);
+    });
+  };
+
+  const handleMemberInputChange = (index, value) => {
+    setMemberQueries((prev) => {
       const next = [...prev];
       next[index] = value;
       return next;
     });
+    setMemberIds((prev) => {
+      const next = [...prev];
+      next[index] = '';
+      return next;
+    });
   };
+
+  const handleMemberSelect = (index, studentId) => {
+    const s = students.find((x) => x._id === studentId);
+    setMemberIds((prev) => {
+      const next = [...prev];
+      next[index] = studentId;
+      return next;
+    });
+    setMemberQueries((prev) => {
+      const next = [...prev];
+      next[index] = s ? getStudentDisplay(s) : '';
+      return next;
+    });
+    setFocusedMemberIndex(null);
+  };
+
+  const handleMemberFocus = (index) => setFocusedMemberIndex(index);
+  const handleMemberBlur = () => setTimeout(() => setFocusedMemberIndex(null), 150);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -153,6 +200,8 @@ export default function RegisterGroup() {
       setIdeaName('');
       setIdeaDescription('');
       setMemberIds(Array(maxMembers).fill(''));
+      setMemberQueries(Array(maxMembers).fill(''));
+      setFocusedMemberIndex(null);
       setSupervisorId(supervisors[0]?._id ?? '');
       showToast('Group submitted for approval.', 'success');
     } catch (err) {
@@ -257,27 +306,64 @@ export default function RegisterGroup() {
           />
         </div>
 
-        {Array.from({ length: maxMembers }, (_, i) => (
-          <div key={i} className={fieldWrapClass}>
-            <label htmlFor={`rollNo-${i}`} className={labelClass}>
-              Select roll no {i + 1} {i < minMembers ? <span className="text-red-500">*</span> : null}
-            </label>
-            <select
-              id={`rollNo-${i}`}
-              value={memberIds[i] ?? ''}
-              onChange={(e) => handleMemberChange(i, e.target.value)}
-              className={inputClass}
-              required={i < minMembers}
-            >
-              <option value="">— Select student —</option>
-              {students.map((s) => (
-                <option key={s._id} value={s._id}>
-                  {s.rollNo} — {s.fullName ?? '—'}
-                </option>
-              ))}
-            </select>
-          </div>
-        ))}
+        {Array.from({ length: maxMembers }, (_, i) => {
+          const selectedStudent = memberIds[i] ? students.find((s) => s._id === memberIds[i]) : null;
+          const inputValue = selectedStudent ? getStudentDisplay(selectedStudent) : (memberQueries[i] ?? '');
+          const showDropdown = focusedMemberIndex === i;
+          const filtered = getFilteredStudentsForSlot(i);
+          return (
+            <div key={i} className={fieldWrapClass}>
+              <label htmlFor={`member-${i}`} className={labelClass}>
+                Member {i + 1} — Roll no or name {i < minMembers ? <span className="text-red-500">*</span> : null}
+              </label>
+              <div className="relative">
+                <input
+                  id={`member-${i}`}
+                  type="text"
+                  placeholder="Type roll no or name to search…"
+                  value={inputValue}
+                  onChange={(e) => handleMemberInputChange(i, e.target.value)}
+                  onFocus={() => handleMemberFocus(i)}
+                  onBlur={handleMemberBlur}
+                  className={inputClass}
+                  autoComplete="off"
+                  aria-autocomplete="list"
+                  aria-expanded={showDropdown && filtered.length > 0}
+                  aria-controls={showDropdown ? `member-list-${i}` : undefined}
+                />
+                {showDropdown && filtered.length > 0 && (
+                  <ul
+                    id={`member-list-${i}`}
+                    className="absolute z-10 w-full mt-1 py-1 bg-white border border-gray-200 rounded-md shadow-lg max-h-48 overflow-auto"
+                    role="listbox"
+                  >
+                    {filtered.slice(0, 20).map((s) => (
+                      <li
+                        key={s._id}
+                        role="option"
+                        className="px-3 py-2 text-sm text-gray-900 cursor-pointer hover:bg-accent/10 focus:bg-accent/10 focus:outline-none"
+                        onMouseDown={(e) => {
+                          e.preventDefault();
+                          handleMemberSelect(i, s._id);
+                        }}
+                      >
+                        {getStudentDisplay(s)}
+                      </li>
+                    ))}
+                    {filtered.length > 20 && (
+                      <li className="px-3 py-2 text-xs text-gray-500">Type more to narrow results</li>
+                    )}
+                  </ul>
+                )}
+                {showDropdown && (memberQueries[i] ?? '').trim() && filtered.length === 0 && (
+                  <div className="absolute z-10 w-full mt-1 py-2 px-3 bg-white border border-gray-200 rounded-md shadow-lg text-sm text-gray-500">
+                    No matching student
+                  </div>
+                )}
+              </div>
+            </div>
+          );
+        })}
 
         <div className={fieldWrapClass}>
           <label htmlFor="supervisor" className={labelClass}>
