@@ -18,6 +18,7 @@ import AllDomains from './components/all/AllDomains';
 import DomainsSupervisors from './components/all/DomainsSupervisors';
 import RegisterGroup from './components/RegisterGroup';
 import GroupStatus from './components/GroupStatus';
+import SupervisorAllocation from './components/SupervisorAllocation';
 import ProtectedRoute from './components/ProtectedRoute';
 
 function App() {
@@ -49,7 +50,7 @@ function App() {
         <Route path="fyp-resources" element={<DashboardPlaceholder />} />
         <Route path="fyp-events" element={<DashboardPlaceholder />} />
         <Route path="previous-fyps" element={<DashboardPlaceholder />} />
-        <Route path="supervisor-allocation" element={<DashboardPlaceholder />} />
+        <Route path="supervisor-allocation" element={<ProtectedRoute><SupervisorAllocation /></ProtectedRoute>} />
         <Route path="group-requests" element={<DashboardPlaceholder />} />
         <Route path="give-marks" element={<DashboardPlaceholder />} />
         <Route path="chat-homes" element={<DashboardPlaceholder />} />

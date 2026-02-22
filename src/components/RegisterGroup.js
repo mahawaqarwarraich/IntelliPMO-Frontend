@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { api } from '../api/client';
 
@@ -19,6 +19,17 @@ export default function RegisterGroup() {
   const [submitError, setSubmitError] = useState('');
   const [submitSuccess, setSubmitSuccess] = useState('');
   const [submitting, setSubmitting] = useState(false);
+  const [toast, setToast] = useState({ show: false, message: '', type: 'success' });
+  const toastTimerRef = useRef(null);
+
+  const showToast = useCallback((message, type = 'success') => {
+    if (toastTimerRef.current) clearTimeout(toastTimerRef.current);
+    setToast({ show: true, message, type });
+    toastTimerRef.current = setTimeout(() => {
+      setToast((t) => ({ ...t, show: false }));
+      toastTimerRef.current = null;
+    }, 5000);
+  }, []);
 
   const [ideaName, setIdeaName] = useState('');
   const [ideaDescription, setIdeaDescription] = useState('');
@@ -143,9 +154,11 @@ export default function RegisterGroup() {
       setIdeaDescription('');
       setMemberIds(Array(maxMembers).fill(''));
       setSupervisorId(supervisors[0]?._id ?? '');
+      showToast('Group submitted for approval.', 'success');
     } catch (err) {
       const msg = err.response?.data?.message || err.message || 'Failed to register group.';
       setSubmitError(msg);
+      showToast(msg, 'error');
     } finally {
       setSubmitting(false);
     }
@@ -180,6 +193,27 @@ export default function RegisterGroup() {
       <p className="text-sm text-gray-500 mb-6">
         Enter your idea and select group members (up to {maxMembers}) and a supervisor.
       </p>
+
+      {toast.show && (
+        <div
+          style={{ animation: 'toast-fade-in 0.25s ease-out' }}
+          className={`fixed top-4 left-1/2 -translate-x-1/2 z-50 max-w-md w-[calc(100%-2rem)] px-4 py-3 rounded-lg shadow-lg text-white text-sm font-medium flex items-center gap-2 ${
+            toast.type === 'success' ? 'bg-green-600' : 'bg-red-600'
+          }`}
+          role="alert"
+        >
+          {toast.type === 'success' ? (
+            <svg className="w-5 h-5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
+              <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+            </svg>
+          ) : (
+            <svg className="w-5 h-5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
+              <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+            </svg>
+          )}
+          <span>{toast.message}</span>
+        </div>
+      )}
 
       <form onSubmit={handleSubmit} className="space-y-5">
         {submitError && (
