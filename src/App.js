@@ -20,6 +20,7 @@ import RegisterGroup from './components/RegisterGroup';
 import GroupStatus from './components/GroupStatus';
 import SupervisorAllocation from './components/SupervisorAllocation';
 import ProtectedRoute from './components/ProtectedRoute';
+import AdminGroupRequest from './components/admin/AdminGroupRequest';
 
 function App() {
   return (
@@ -51,7 +52,7 @@ function App() {
         <Route path="fyp-events" element={<DashboardPlaceholder />} />
         <Route path="previous-fyps" element={<DashboardPlaceholder />} />
         <Route path="supervisor-allocation" element={<ProtectedRoute><SupervisorAllocation /></ProtectedRoute>} />
-        <Route path="group-requests" element={<DashboardPlaceholder />} />
+        <Route path="admin/group-requests" element={<AdminGroupRequest />} />
         <Route path="give-marks" element={<DashboardPlaceholder />} />
         <Route path="chat-homes" element={<DashboardPlaceholder />} />
         <Route path="register-group" element={<RegisterGroup />} />

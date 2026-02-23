@@ -23,7 +23,7 @@ export const sidebarLinks = {
     { label: 'FYP Events', path: '/dashboard/fyp-events', icon: 'calendar' },
     { label: 'Previous FYPs', path: '/dashboard/previous-fyps', icon: 'file' },
     { label: 'Supervisor Allocation Status', path: '/dashboard/supervisor-allocation', icon: 'users' },
-    { label: 'Group Requests', path: '/dashboard/group-requests', icon: 'file' },
+    { label: 'Group Requests', path: '/dashboard/admin/group-requests', icon: 'file' },
     { label: 'Give Marks', path: '/dashboard/give-marks', icon: 'file' },
   ],
   student: [
