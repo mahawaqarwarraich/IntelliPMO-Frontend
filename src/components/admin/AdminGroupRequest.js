@@ -12,7 +12,6 @@ export default function AdminGroupRequest() {
   const toastTimerRef = useRef(null);
   const [localApprovals, setLocalApprovals] = useState({});
   const [localMessages, setLocalMessages] = useState({});
-  const [savingId, setSavingId] = useState(null);
 
   const showToast = useCallback((message, type = 'success') => {
     if (toastTimerRef.current) clearTimeout(toastTimerRef.current);
@@ -55,23 +54,8 @@ export default function AdminGroupRequest() {
     setLocalMessages((prev) => ({ ...prev, [groupId]: value }));
   };
 
-  const handleSave = (groupId) => {
-    const adminStatus = localApprovals[groupId] === 'accepted' ? 'accepted' : 'rejected';
-    const adminMessage = localMessages[groupId] ?? '';
-    setSavingId(groupId);
-    api
-      .patch(`/api/groups/${groupId}`, { adminStatus, adminMessage })
-      .then(() => {
-        setGroups((prev) => prev.filter((g) => g._id !== groupId));
-        setLocalApprovals((prev) => { const n = { ...prev }; delete n[groupId]; return n; });
-        setLocalMessages((prev) => { const n = { ...prev }; delete n[groupId]; return n; });
-        showToast('Saved.', 'success');
-      })
-      .catch((err) => {
-        const msg = err.response?.data?.message || err.message || 'Failed to save.';
-        showToast(msg, 'error');
-      })
-      .finally(() => setSavingId(null));
+  const handleSave = () => {
+    showToast('Save is not available.', 'error');
   };
 
   const formatDate = (dateVal) => {
@@ -185,11 +169,10 @@ export default function AdminGroupRequest() {
                     <td className="py-3 px-4 align-top">
                       <button
                         type="button"
-                        onClick={() => handleSave(g._id)}
-                        disabled={savingId === g._id}
-                        className="py-2 px-4 bg-accent text-white border-0 rounded-md font-medium text-sm cursor-pointer hover:bg-accent-hover focus:outline-none focus:ring-2 focus:ring-accent/30 disabled:opacity-70 disabled:cursor-not-allowed"
+                        onClick={handleSave}
+                        className="py-2 px-4 bg-accent text-white border-0 rounded-md font-medium text-sm cursor-pointer hover:bg-accent-hover focus:outline-none focus:ring-2 focus:ring-accent/30"
                       >
-                        {savingId === g._id ? 'Saving…' : 'Save'}
+                        Save
                       </button>
                     </td>
                   </tr>
