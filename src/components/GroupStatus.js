@@ -88,7 +88,8 @@ export default function GroupStatus() {
     );
   }
 
-  const approvalLabel = (status) => (status ? 'Approved' : 'Pending');
+  const approvalLabel = (status) =>
+    status === 'accepted' ? 'Accepted' : status === 'rejected' ? 'Rejected' : 'Pending';
 
   return (
     <div className="max-w-4xl mx-auto">

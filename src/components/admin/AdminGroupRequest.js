@@ -34,7 +34,7 @@ export default function AdminGroupRequest() {
         const approvals = {};
         const messages = {};
         list.forEach((g) => {
-          approvals[g._id] = g.adminStatus === true ? 1 : 0;
+          approvals[g._id] = g.adminStatus === 'accepted' ? 'accepted' : 'rejected';
           messages[g._id] = g.adminMessage ?? '';
         });
         setLocalApprovals(approvals);
@@ -56,7 +56,7 @@ export default function AdminGroupRequest() {
   };
 
   const handleSave = (groupId) => {
-    const adminStatus = localApprovals[groupId] === 1;
+    const adminStatus = localApprovals[groupId] === 'accepted' ? 'accepted' : 'rejected';
     const adminMessage = localMessages[groupId] ?? '';
     setSavingId(groupId);
     api
@@ -147,7 +147,7 @@ export default function AdminGroupRequest() {
                     <td className="py-3 px-4 text-sm text-gray-900 align-top">{g.ideaName ?? '—'}</td>
                     <td className="py-3 px-4 text-sm text-gray-900 align-top">{g.supervisorName ?? '—'}</td>
                     <td className="py-3 px-4 text-sm text-gray-900 align-top">
-                      {g.supervisorStatus === true ? 'Approved' : g.supervisorStatus === false ? 'Rejected' : '—'}
+                      {g.supervisorStatus === 'accepted' ? 'Accepted' : g.supervisorStatus === 'rejected' ? 'Rejected' : 'Pending'}
                     </td>
                     <td className="py-3 px-4 align-top">
                       <div className="flex flex-wrap gap-3">
@@ -155,8 +155,8 @@ export default function AdminGroupRequest() {
                           <input
                             type="radio"
                             name={`approval-${g._id}`}
-                            checked={(localApprovals[g._id] ?? 0) === 1}
-                            onChange={() => setApproval(g._id, 1)}
+                            checked={(localApprovals[g._id] ?? 'rejected') === 'accepted'}
+                            onChange={() => setApproval(g._id, 'accepted')}
                             className="text-accent focus:ring-accent"
                           />
                           <span className="text-sm">Accepted</span>
@@ -165,8 +165,8 @@ export default function AdminGroupRequest() {
                           <input
                             type="radio"
                             name={`approval-${g._id}`}
-                            checked={(localApprovals[g._id] ?? 0) === 0}
-                            onChange={() => setApproval(g._id, 0)}
+                            checked={(localApprovals[g._id] ?? 'rejected') === 'rejected'}
+                            onChange={() => setApproval(g._id, 'rejected')}
                             className="text-accent focus:ring-accent"
                           />
                           <span className="text-sm">Rejected</span>
