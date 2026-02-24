@@ -51,7 +51,7 @@ export const sidebarLinks = {
     { label: 'Create Meeting', path: '/dashboard/create-meeting', icon: 'calendar' },
     { label: 'All Meetings', path: '/dashboard/all-meetings', icon: 'calendar' },
     { label: 'Supervisor Allocation Status', path: '/dashboard/allocation-status', icon: 'users' },
-    { label: 'Group Requests', path: '/dashboard/group-requests', icon: 'file' },
+    { label: 'Group Requests', path: '/dashboard/supervisor/group-requests', icon: 'file' },
     { label: 'Groups and Evaluation Panels (defense 1)', path: '/dashboard/groups-defense1', icon: 'users' },
     { label: 'Groups and Evaluation Panels (defense 2)', path: '/dashboard/groups-defense2', icon: 'users' },
     { label: 'Give Marks', path: '/dashboard/give-marks', icon: 'file' },
