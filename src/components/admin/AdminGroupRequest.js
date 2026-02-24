@@ -27,7 +27,7 @@ export default function AdminGroupRequest() {
     setLoading(true);
     setError('');
     api
-      .get('/api/groups/status', { params: { status: 0 } })
+      .get('/api/admin/groups')
       .then((res) => {
         const list = res.data?.groups ?? [];
         setGroups(list);
@@ -60,7 +60,7 @@ export default function AdminGroupRequest() {
     const message = localMessages[groupId] ?? '';
     setSavingId(groupId);
     api
-      .patch(`/api/groups/${groupId}`, { approval, message })
+      .patch(`/api/admin/groups/${groupId}`, { approval, message })
       .then(() => {
         setGroups((prev) => prev.filter((g) => g._id !== groupId));
         setLocalApprovals((prev) => {
