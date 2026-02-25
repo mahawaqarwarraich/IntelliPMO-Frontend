@@ -22,6 +22,7 @@ import SupervisorAllocation from './components/SupervisorAllocation';
 import ProtectedRoute from './components/ProtectedRoute';
 import AdminGroupRequest from './components/admin/AdminGroupRequest';
 import SupervisorGroupRequest from './components/supervisor/SupervisorGroupRequest';
+import AllGroups from './components/all/AllGroups';
 
 function App() {
   return (
@@ -45,6 +46,7 @@ function App() {
         <Route path="all-domains" element={<AllDomains />} />
         <Route path="all-supervisors" element={<DashboardPlaceholder />} />
         <Route path="all-evaluators" element={<DashboardPlaceholder />} />
+        <Route path="all-groups" element={<AllGroups />} />
         <Route path="groups-defense1" element={<DashboardPlaceholder />} />
         <Route path="groups-defense2" element={<DashboardPlaceholder />} />
         <Route path="domains-supervisors" element={<DomainsSupervisors />} />

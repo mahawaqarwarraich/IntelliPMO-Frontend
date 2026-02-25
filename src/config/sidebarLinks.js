@@ -24,6 +24,7 @@ export const sidebarLinks = {
     { label: 'Previous FYPs', path: '/dashboard/previous-fyps', icon: 'file' },
     { label: 'Supervisor Allocation Status', path: '/dashboard/supervisor-allocation', icon: 'users' },
     { label: 'Group Requests', path: '/dashboard/admin/group-requests', icon: 'file' },
+    { label: 'All registered groups', path: '/dashboard/all-groups', icon: 'users' },
     { label: 'Give Marks', path: '/dashboard/give-marks', icon: 'file' },
   ],
   student: [
@@ -41,6 +42,7 @@ export const sidebarLinks = {
     { label: 'Supervisor Allocation Status', path: '/dashboard/supervisor-allocation', icon: 'users' },
     { label: 'Groups & Evaluation Panels (defense 1)', path: '/dashboard/groups-defense1', icon: 'users' },
     { label: 'Groups and Evaluation Panels (defense 2)', path: '/dashboard/groups-defense2', icon: 'users' },
+    { label: 'All registered groups', path: '/dashboard/all-groups', icon: 'users' },
   ],
   supervisor: [
     { label: 'All domains', path: '/dashboard/all-domains', icon: 'file' },
@@ -54,6 +56,7 @@ export const sidebarLinks = {
     { label: 'Group Requests', path: '/dashboard/supervisor/group-requests', icon: 'file' },
     { label: 'Groups and Evaluation Panels (defense 1)', path: '/dashboard/groups-defense1', icon: 'users' },
     { label: 'Groups and Evaluation Panels (defense 2)', path: '/dashboard/groups-defense2', icon: 'users' },
+    { label: 'All registered groups', path: '/dashboard/all-groups', icon: 'users' },
     { label: 'Give Marks', path: '/dashboard/give-marks', icon: 'file' },
   ],
   evaluator: [
