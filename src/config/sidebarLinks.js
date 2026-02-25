@@ -55,6 +55,7 @@ export const sidebarLinks = {
     { label: 'All Meetings', path: '/dashboard/all-meetings', icon: 'calendar' },
     { label: 'Supervisor Allocation Status', path: '/dashboard/allocation-status', icon: 'users' },
     { label: 'Group Requests', path: '/dashboard/supervisor/group-requests', icon: 'file' },
+    { label: 'My groups', path: '/dashboard/my-groups', icon: 'users' },
     { label: 'Groups and Evaluation Panels (defense 1)', path: '/dashboard/groups-defense1', icon: 'users' },
     { label: 'Groups and Evaluation Panels (defense 2)', path: '/dashboard/groups-defense2', icon: 'users' },
     { label: 'All registered groups', path: '/dashboard/all-groups', icon: 'users' },

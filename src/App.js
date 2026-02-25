@@ -24,6 +24,7 @@ import AdminGroupRequest from './components/admin/AdminGroupRequest';
 import SupervisorGroupRequest from './components/supervisor/SupervisorGroupRequest';
 import AllGroups from './components/all/AllGroups';
 import ChatRoom from './components/all/ChatRoom';
+import MyGroup from './components/supervisor/MyGroup';
 
 function App() {
   return (
@@ -58,6 +59,7 @@ function App() {
         <Route path="supervisor-allocation" element={<ProtectedRoute><SupervisorAllocation /></ProtectedRoute>} />
         <Route path="admin/group-requests" element={<AdminGroupRequest />} />
         <Route path="supervisor/group-requests" element={<SupervisorGroupRequest />} />
+        <Route path="my-groups" element={<MyGroup />} />
         <Route path="give-marks" element={<DashboardPlaceholder />} />
         <Route path="chat-rooms" element={<ChatRoom />} />
         <Route path="register-group" element={<RegisterGroup />} />
