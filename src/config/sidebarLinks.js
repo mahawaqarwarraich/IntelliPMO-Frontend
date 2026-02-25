@@ -28,7 +28,7 @@ export const sidebarLinks = {
     { label: 'Give Marks', path: '/dashboard/give-marks', icon: 'file' },
   ],
   student: [
-    { label: 'Chat homes', path: '/dashboard/chat-homes', icon: 'message' },
+    { label: 'Chat rooms', path: '/dashboard/chat-rooms', icon: 'message' },
     { label: 'All domains', path: '/dashboard/all-domains', icon: 'file' },
     { label: 'Domains and supervisors', path: '/dashboard/domains-supervisors', icon: 'file' },
     { label: 'Session policy', path: '/dashboard/session-policy', icon: 'file' },
@@ -45,6 +45,7 @@ export const sidebarLinks = {
     { label: 'All registered groups', path: '/dashboard/all-groups', icon: 'users' },
   ],
   supervisor: [
+    { label: 'Chat rooms', path: '/dashboard/chat-rooms', icon: 'message' },
     { label: 'All domains', path: '/dashboard/all-domains', icon: 'file' },
     { label: 'Domains and supervisors', path: '/dashboard/domains-supervisors', icon: 'file' },
     { label: 'Session policy', path: '/dashboard/session-policy', icon: 'file' },

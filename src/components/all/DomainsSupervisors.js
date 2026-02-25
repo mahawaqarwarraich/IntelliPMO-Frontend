@@ -6,6 +6,7 @@ export default function DomainsSupervisors() {
   const [supervisors, setSupervisors] = useState([]);
   const [activeSessionYear, setActiveSessionYear] = useState(null);
   const [error, setError] = useState(null);
+  
 
   useEffect(() => {
     setLoading(true);
