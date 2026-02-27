@@ -1,9 +1,12 @@
 import { useState, useEffect } from 'react';
+import { useNavigate, Outlet, useParams } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { api } from '../../api/client';
 
 export default function ChatRoom() {
   const { user } = useAuth();
+  const navigate = useNavigate();
+  const { groupId } = useParams();
   const [loading, setLoading] = useState(true);
   const [sessionOk, setSessionOk] = useState(false);
   const [groups, setGroups] = useState([]);
@@ -76,6 +79,12 @@ export default function ChatRoom() {
     );
   }
 
+  // When a specific group is selected (nested route /chat-rooms/:groupId),
+  // hide the chat room list and render the child route (Group component) instead.
+  if (groupId) {
+    return <Outlet />;
+  }
+
   return (
     <div className="max-w-4xl mx-auto">
       <h1 className="text-2xl font-semibold text-gray-900 mb-1">Chat rooms</h1>
@@ -90,9 +99,11 @@ export default function ChatRoom() {
       ) : (
         <div className="grid gap-4 sm:grid-cols-2">
           {groups.map((g) => (
-            <div
+            <button
               key={g._id}
-              className="rounded-xl border border-gray-200 bg-white shadow-sm p-5 transition-shadow hover:shadow-md focus-within:ring-2 focus-within:ring-accent/20 focus-within:border-accent"
+              type="button"
+              onClick={() => navigate(`/dashboard/chat-rooms/${g._id}`)}
+              className="text-left rounded-xl border border-gray-200 bg-white shadow-sm p-5 transition-shadow hover:shadow-md focus:outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent"
             >
               <div className="flex items-start gap-3">
                 <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-accent/10 flex items-center justify-center">
@@ -107,10 +118,11 @@ export default function ChatRoom() {
                   <p className="mt-0.5 text-sm text-gray-500">Group chat</p>
                 </div>
               </div>
-            </div>
+            </button>
           ))}
         </div>
       )}
+
     </div>
   );
 }

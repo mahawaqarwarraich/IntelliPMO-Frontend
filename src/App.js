@@ -24,6 +24,7 @@ import AdminGroupRequest from './components/admin/AdminGroupRequest';
 import SupervisorGroupRequest from './components/supervisor/SupervisorGroupRequest';
 import AllGroups from './components/all/AllGroups';
 import ChatRoom from './components/all/ChatRoom';
+import Group from './components/all/Group';
 import MyGroup from './components/supervisor/MyGroup';
 
 function App() {
@@ -61,7 +62,10 @@ function App() {
         <Route path="supervisor/group-requests" element={<SupervisorGroupRequest />} />
         <Route path="my-groups" element={<MyGroup />} />
         <Route path="give-marks" element={<DashboardPlaceholder />} />
-        <Route path="chat-rooms" element={<ChatRoom />} />
+        <Route path="chat-rooms" element={<ChatRoom />}>
+          <Route path=":groupId" element={<Group />} />
+        </Route>
+        
         <Route path="register-group" element={<RegisterGroup />} />
         <Route path="request-status" element={<ProtectedRoute><GroupStatus /></ProtectedRoute>} />
         <Route path="fyp-guide" element={<DashboardPlaceholder />} />
