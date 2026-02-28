@@ -100,6 +100,8 @@ export default function Group() {
 
   const groupName = groupInfo?.ideaName ?? (groupDetailsLoading ? 'Loading…' : 'Group chat');
   const memberNames = groupInfo?.memberNames ?? [];
+  const supervisorName = groupInfo?.supervisorName ?? '';
+  const allMemberNames = [...memberNames, ...(supervisorName ? [supervisorName] : [])];
   const visibleMessages = useMemo(
     () => messages.filter((m) => String(m.groupId) === String(groupId)),
     [messages, groupId]
@@ -183,7 +185,7 @@ export default function Group() {
             {groupName}
           </h2>
           <p className="text-xs text-gray-500 truncate">
-            {memberNames.length > 0 ? memberNames.join(', ') : 'Members'}
+            {allMemberNames.length > 0 ? allMemberNames.join(', ') : 'Members'}
           </p>
         </div>
       </header>
