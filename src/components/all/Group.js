@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { api } from '../../api/client';
@@ -21,8 +21,20 @@ export default function Group() {
   const [input, setInput] = useState('');
   const [fileName, setFileName] = useState('');
   const [fileType, setFileType] = useState('');
+  const [sending, setSending] = useState(false);
+  const [toast, setToast] = useState({ show: false, message: '', type: 'success' });
+  const toastTimerRef = useRef(null);
   const fileInputRef = useRef(null);
   const bottomRef = useRef(null);
+
+  const showToast = useCallback((message, type = 'success') => {
+    if (toastTimerRef.current) clearTimeout(toastTimerRef.current);
+    setToast({ show: true, message, type });
+    toastTimerRef.current = setTimeout(() => {
+      setToast((t) => ({ ...t, show: false }));
+      toastTimerRef.current = null;
+    }, 3000);
+  }, []);
 
   useEffect(() => {
     setLoading(true);
@@ -113,23 +125,37 @@ export default function Group() {
 
   const handleSend = () => {
     const text = input.trim();
-    if (!text && !fileName) return;
-    const now = new Date();
-    const newMessage = {
-      id: `local-${now.getTime()}`,
-      groupId,
-      senderId: 'you',
-      senderName: 'You',
-      content: text || (fileName ? `Sent a file: ${fileName}` : ''),
-      createdAt: now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-      isOwn: true,
-      fileName: fileName || undefined,
-      fileType: fileType || undefined,
-    };
-    setMessages((prev) => [...prev, newMessage]);
-    setInput('');
-    setFileName('');
-    setFileType('');
+    if (!text) return;
+    if (!user?.id) return;
+    setSending(true);
+    api
+      .post('/api/messages', { groupId, senderId: user.id, content: text })
+      .then((res) => {
+        const msg = res.data?.message;
+        if (!msg) return;
+        const createdAt =
+          msg.createdAt
+            ? new Date(msg.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+            : new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        setMessages((prev) => [
+          ...prev,
+          {
+            id: msg._id,
+            groupId: msg.groupId,
+            senderId: msg.senderId,
+            senderName: msg.senderName ?? 'You',
+            content: msg.content ?? text,
+            createdAt,
+            isOwn: true,
+          },
+        ]);
+        setInput('');
+      })
+      .catch((err) => {
+        const msg = err.response?.data?.message ?? err.message ?? 'Failed to send message.';
+        showToast(msg, 'error');
+      })
+      .finally(() => setSending(false));
   };
 
   const handleFileClick = () => fileInputRef.current?.click();
@@ -174,6 +200,7 @@ export default function Group() {
   }
 
   return (
+    <>
     <div className="mt-6 rounded-2xl border border-gray-200 bg-white shadow-sm flex flex-col h-[70vh] max-h-[600px]">
       {/* Header: real group name and member names from API */}
       <header className="px-4 sm:px-5 py-3 border-b border-gray-200 flex items-center gap-3 flex-shrink-0">
@@ -260,7 +287,7 @@ export default function Group() {
         <button
           type="button"
           onClick={handleSend}
-          disabled={!input.trim() && !fileName}
+          disabled={!input.trim() || sending}
           className="flex-shrink-0 w-9 h-9 rounded-full bg-accent text-white flex items-center justify-center hover:bg-accent-hover focus:outline-none focus:ring-2 focus:ring-accent/30 disabled:opacity-60 disabled:cursor-not-allowed"
           aria-label="Send"
         >
@@ -270,5 +297,17 @@ export default function Group() {
         </button>
       </div>
     </div>
+    {toast.show && (
+      <div
+        className={`fixed bottom-6 left-1/2 -translate-x-1/2 z-50 px-4 py-2 rounded-lg text-white text-sm font-medium shadow-lg ${
+          toast.type === 'success' ? 'bg-green-600' : 'bg-red-600'
+        }`}
+        style={{ animation: 'toast-fade-in 0.25s ease-out' }}
+        role="alert"
+      >
+        <span>{toast.message}</span>
+      </div>
+    )}
+    </>
   );
 }
