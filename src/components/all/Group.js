@@ -3,11 +3,6 @@ import { useParams } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { api } from '../../api/client';
 
-const MOCK_GROUPS = [
-  { id: '1', name: 'Smart Attendance System', members: ['Ali', 'Sara', 'Usman'] },
-  { id: '2', name: 'Campus Navigation App', members: ['Fatima', 'Ahmed'] },
-];
-
 const MOCK_MESSAGES = [
   { id: 'm1', groupId: '1', senderId: 'u1', senderName: 'Ali', content: 'Hi everyone, let\'s finalize the module breakdown.', createdAt: '10:15 AM', isOwn: false },
   { id: 'm2', groupId: '1', senderId: 'u2', senderName: 'You', content: 'Sure, I think I can take the backend APIs.', createdAt: '10:16 AM', isOwn: true },
@@ -20,6 +15,8 @@ export default function Group() {
   const [loading, setLoading] = useState(true);
   const [sessionOk, setSessionOk] = useState(false);
   const [canAccessGroup, setCanAccessGroup] = useState(false);
+  const [groupInfo, setGroupInfo] = useState(null);
+  const [groupDetailsLoading, setGroupDetailsLoading] = useState(false);
   const [messages, setMessages] = useState(MOCK_MESSAGES);
   const [input, setInput] = useState('');
   const [fileName, setFileName] = useState('');
@@ -76,14 +73,36 @@ export default function Group() {
       .finally(() => setLoading(false));
   }, [user?.token, user?.sessionId, user?.role, groupId]);
 
-  const group = useMemo(
-    () => MOCK_GROUPS.find((g) => g.id === groupId) ?? MOCK_GROUPS[0],
-    [groupId]
-  );
+  // Fetch real group name and member names when user has access (for header).
+  useEffect(() => {
+    if (!canAccessGroup || !groupId || !user?.token) {
+      setGroupInfo(null);
+      return;
+    }
+    setGroupDetailsLoading(true);
+    api
+      .get(`/api/groups/details/${groupId}`)
+      .then((res) => {
+        const g = res.data?.group;
+        setGroupInfo(
+          g
+            ? {
+                ideaName: g.ideaName ?? '',
+                memberNames: Array.isArray(g.memberNames) ? g.memberNames : [],
+                supervisorName: g.supervisorName ?? '',
+              }
+            : null
+        );
+      })
+      .catch(() => setGroupInfo(null))
+      .finally(() => setGroupDetailsLoading(false));
+  }, [canAccessGroup, groupId, user?.token]);
 
+  const groupName = groupInfo?.ideaName ?? (groupDetailsLoading ? 'Loading…' : 'Group chat');
+  const memberNames = groupInfo?.memberNames ?? [];
   const visibleMessages = useMemo(
-    () => messages.filter((m) => m.groupId === group.id),
-    [messages, group.id]
+    () => messages.filter((m) => String(m.groupId) === String(groupId)),
+    [messages, groupId]
   );
 
   useEffect(() => {
@@ -96,7 +115,7 @@ export default function Group() {
     const now = new Date();
     const newMessage = {
       id: `local-${now.getTime()}`,
-      groupId: group.id,
+      groupId,
       senderId: 'you',
       senderName: 'You',
       content: text || (fileName ? `Sent a file: ${fileName}` : ''),
@@ -154,17 +173,17 @@ export default function Group() {
 
   return (
     <div className="mt-6 rounded-2xl border border-gray-200 bg-white shadow-sm flex flex-col h-[70vh] max-h-[600px]">
-      {/* Header */}
+      {/* Header: real group name and member names from API */}
       <header className="px-4 sm:px-5 py-3 border-b border-gray-200 flex items-center gap-3 flex-shrink-0">
         <div className="flex-shrink-0 w-9 h-9 rounded-full bg-accent/10 flex items-center justify-center text-accent font-semibold text-sm">
-          {group.name?.[0] ?? 'G'}
+          {groupName?.[0] ?? 'G'}
         </div>
         <div className="min-w-0 flex-1">
           <h2 className="text-sm sm:text-base font-semibold text-gray-900 truncate">
-            {group.name ?? 'Group chat'}
+            {groupName}
           </h2>
           <p className="text-xs text-gray-500 truncate">
-            {group.members?.length ? group.members.join(', ') : 'Members'}
+            {memberNames.length > 0 ? memberNames.join(', ') : 'Members'}
           </p>
         </div>
       </header>
