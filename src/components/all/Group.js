@@ -3,11 +3,22 @@ import { useParams } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { api } from '../../api/client';
 
-const MOCK_MESSAGES = [
-  { id: 'm1', groupId: '1', senderId: 'u1', senderName: 'Ali', content: 'Hi everyone, let\'s finalize the module breakdown.', createdAt: '10:15 AM', isOwn: false },
-  { id: 'm2', groupId: '1', senderId: 'u2', senderName: 'You', content: 'Sure, I think I can take the backend APIs.', createdAt: '10:16 AM', isOwn: true },
-  { id: 'm3', groupId: '1', senderId: 'u3', senderName: 'Sara', content: 'I\'ll work on the UI screens.', createdAt: '10:17 AM', isOwn: false },
-];
+function formatTime(date) {
+  return new Date(date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+}
+
+function getDateLabel(dateStr) {
+  const d = new Date(dateStr);
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const yesterday = new Date(today);
+  yesterday.setDate(yesterday.getDate() - 1);
+  const dDay = new Date(d);
+  dDay.setHours(0, 0, 0, 0);
+  if (dDay.getTime() === today.getTime()) return 'Today';
+  if (dDay.getTime() === yesterday.getTime()) return 'Yesterday';
+  return d.toLocaleDateString([], { day: 'numeric', month: 'short', year: 'numeric' });
+}
 
 export default function Group() {
   const { user } = useAuth();
@@ -17,7 +28,8 @@ export default function Group() {
   const [canAccessGroup, setCanAccessGroup] = useState(false);
   const [groupInfo, setGroupInfo] = useState(null);
   const [groupDetailsLoading, setGroupDetailsLoading] = useState(false);
-  const [messages, setMessages] = useState(MOCK_MESSAGES);
+  const [messages, setMessages] = useState([]);
+  const [messagesLoading, setMessagesLoading] = useState(false);
   const [input, setInput] = useState('');
   const [fileName, setFileName] = useState('');
   const [fileType, setFileType] = useState('');
@@ -110,14 +122,63 @@ export default function Group() {
       .finally(() => setGroupDetailsLoading(false));
   }, [canAccessGroup, groupId, user?.token]);
 
+  // Fetch messages for this group when chat is accessible.
+  useEffect(() => {
+    if (!canAccessGroup || !groupId || !user?.token) {
+      setMessages([]);
+      return;
+    }
+    setMessagesLoading(true);
+    api
+      .get(`/api/messages/${groupId}`)
+      .then((res) => {
+        const list = res.data?.messages ?? [];
+        const normalized = list.map((m) => ({
+          id: m._id,
+          groupId: m.groupId,
+          senderId: m.senderId,
+          senderName: m.senderName ?? '',
+          content: m.content ?? '',
+          createdAt: m.createdAt,
+          createdAtTime: formatTime(m.createdAt),
+          isOwn: String(m.senderId) === String(user?.id),
+        }));
+        setMessages(normalized);
+      })
+      .catch(() => setMessages([]))
+      .finally(() => setMessagesLoading(false));
+  }, [canAccessGroup, groupId, user?.token, user?.id]);
+
   const groupName = groupInfo?.ideaName ?? (groupDetailsLoading ? 'Loading…' : 'Group chat');
   const memberNames = groupInfo?.memberNames ?? [];
   const supervisorName = groupInfo?.supervisorName ?? '';
   const allMemberNames = [...memberNames, ...(supervisorName ? [supervisorName] : [])];
+
   const visibleMessages = useMemo(
     () => messages.filter((m) => String(m.groupId) === String(groupId)),
     [messages, groupId]
   );
+
+  // Group messages by date (Today / Yesterday / date) and mark which message in each run shows sender name.
+  const { dateSections, showSenderName } = useMemo(() => {
+    const sections = {};
+    const showName = {};
+    let prevSenderId = null;
+    visibleMessages.forEach((m) => {
+      const dateStr = m.createdAt ? new Date(m.createdAt).toISOString().slice(0, 10) : '';
+      if (!sections[dateStr]) sections[dateStr] = [];
+      sections[dateStr].push(m);
+      const isFirstInRun = prevSenderId !== String(m.senderId);
+      showName[m.id] = isFirstInRun;
+      prevSenderId = String(m.senderId);
+    });
+    const dateSections = Object.entries(sections).map(([dateStr, msgs]) => ({
+      dateStr,
+      label: msgs[0]?.createdAt ? getDateLabel(msgs[0].createdAt) : dateStr,
+      messages: msgs,
+    }));
+    return { dateSections, showSenderName: showName };
+  }, [visibleMessages]);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -133,10 +194,7 @@ export default function Group() {
       .then((res) => {
         const msg = res.data?.message;
         if (!msg) return;
-        const createdAt =
-          msg.createdAt
-            ? new Date(msg.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-            : new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        const createdAt = msg.createdAt || new Date().toISOString();
         setMessages((prev) => [
           ...prev,
           {
@@ -146,6 +204,7 @@ export default function Group() {
             senderName: msg.senderName ?? 'You',
             content: msg.content ?? text,
             createdAt,
+            createdAtTime: formatTime(createdAt),
             isOwn: true,
           },
         ]);
@@ -217,34 +276,49 @@ export default function Group() {
         </div>
       </header>
 
-      {/* Messages list */}
+      {/* Messages list: grouped by date (Today / Yesterday / date), sender name only on first of run */}
       <div className="flex-1 min-h-0 overflow-y-auto px-3 sm:px-4 py-3 bg-gray-50">
-        {visibleMessages.map((m) => (
-          <div
-            key={m.id}
-            className={`mb-2 flex ${m.isOwn ? 'justify-end' : 'justify-start'}`}
-          >
-            <div
-              className={`max-w-[75%] rounded-2xl px-3 py-2 text-sm shadow-sm ${
-                m.isOwn
-                  ? 'bg-accent text-white rounded-br-sm'
-                  : 'bg-white text-gray-900 rounded-bl-sm border border-gray-200'
-              }`}
-            >
-              {!m.isOwn && (
-                <p className="text-[11px] font-semibold text-accent mb-0.5">
-                  {m.senderName}
-                </p>
-              )}
-              <p className="whitespace-pre-wrap break-words">{m.content}</p>
-              <p
-                className={`mt-1 text-[10px] ${m.isOwn ? 'text-white/80' : 'text-gray-400'}`}
-              >
-                {m.createdAt}
-              </p>
-            </div>
+        {messagesLoading ? (
+          <div className="flex justify-center py-8">
+            <div className="w-8 h-8 border-2 border-accent border-t-transparent rounded-full animate-spin" aria-hidden />
           </div>
-        ))}
+        ) : (
+          dateSections.map((section) => (
+            <div key={section.dateStr}>
+              <div className="flex justify-center my-3">
+                <span className="text-[11px] font-medium text-gray-500 bg-gray-200/80 px-2.5 py-1 rounded-full">
+                  {section.label}
+                </span>
+              </div>
+              {section.messages.map((m) => (
+                <div
+                  key={m.id}
+                  className={`mb-1 flex ${m.isOwn ? 'justify-end' : 'justify-start'}`}
+                >
+                  <div
+                    className={`max-w-[75%] rounded-2xl px-3 py-2 text-sm shadow-sm ${
+                      m.isOwn
+                        ? 'bg-accent text-white rounded-br-sm'
+                        : 'bg-white text-gray-900 rounded-bl-sm border border-gray-200'
+                    }`}
+                  >
+                    {!m.isOwn && showSenderName[m.id] && (
+                      <p className="text-[11px] font-semibold text-accent mb-0.5">
+                        {m.senderName}
+                      </p>
+                    )}
+                    <p className="whitespace-pre-wrap break-words">{m.content}</p>
+                    <p
+                      className={`mt-1 text-[10px] ${m.isOwn ? 'text-white/80' : 'text-gray-400'}`}
+                    >
+                      {m.createdAtTime ?? m.createdAt}
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ))
+        )}
         <div ref={bottomRef} />
       </div>
 
