@@ -38,6 +38,7 @@ export default function Group() {
   const toastTimerRef = useRef(null);
   const fileInputRef = useRef(null);
   const bottomRef = useRef(null);
+  const lastMessageTimestampRef = useRef(null);
 
   const showToast = useCallback((message, type = 'success') => {
     if (toastTimerRef.current) clearTimeout(toastTimerRef.current);
@@ -126,6 +127,7 @@ export default function Group() {
   useEffect(() => {
     if (!canAccessGroup || !groupId || !user?.token) {
       setMessages([]);
+      lastMessageTimestampRef.current = null;
       return;
     }
     setMessagesLoading(true);
@@ -144,10 +146,58 @@ export default function Group() {
           isOwn: String(m.senderId) === String(user?.id),
         }));
         setMessages(normalized);
+        const maxTs = normalized.length
+          ? Math.max(...normalized.map((m) => new Date(m.createdAt).getTime()))
+          : null;
+        lastMessageTimestampRef.current = maxTs != null ? new Date(maxTs).toISOString() : null;
       })
       .catch(() => setMessages([]))
       .finally(() => setMessagesLoading(false));
   }, [canAccessGroup, groupId, user?.token, user?.id]);
+
+  // Poll for new messages every 3 seconds (only after initial load).
+  useEffect(() => {
+    if (!canAccessGroup || !groupId || !user?.token || messagesLoading) return;
+
+    const poll = () => {
+      const after = lastMessageTimestampRef.current;
+      const url = after
+        ? `/api/messages/${groupId}?after=${encodeURIComponent(after)}`
+        : `/api/messages/${groupId}`;
+      api
+        .get(url)
+        .then((res) => {
+          const list = res.data?.messages ?? [];
+          if (list.length === 0) return;
+          const normalized = list.map((m) => ({
+            id: m._id,
+            groupId: m.groupId,
+            senderId: m.senderId,
+            senderName: m.senderName ?? '',
+            content: m.content ?? '',
+            createdAt: m.createdAt,
+            createdAtTime: formatTime(m.createdAt),
+            isOwn: String(m.senderId) === String(user?.id),
+          }));
+          setMessages((prev) => {
+            const byId = new Map(prev.map((m) => [m.id, m]));
+            normalized.forEach((m) => byId.set(m.id, m));
+            const merged = Array.from(byId.values()).sort(
+              (a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+            );
+            const maxTs = merged.length
+              ? Math.max(...merged.map((m) => new Date(m.createdAt).getTime()))
+              : null;
+            lastMessageTimestampRef.current = maxTs != null ? new Date(maxTs).toISOString() : null;
+            return merged;
+          });
+        })
+        .catch(() => {});
+    };
+
+    const intervalId = setInterval(poll, 3000);
+    return () => clearInterval(intervalId);
+  }, [canAccessGroup, groupId, user?.token, user?.id, messagesLoading]);
 
   const groupName = groupInfo?.ideaName ?? (groupDetailsLoading ? 'Loading…' : 'Group chat');
   const memberNames = groupInfo?.memberNames ?? [];
@@ -195,6 +245,8 @@ export default function Group() {
         const msg = res.data?.message;
         if (!msg) return;
         const createdAt = msg.createdAt || new Date().toISOString();
+        const iso = typeof createdAt === 'string' ? createdAt : new Date(createdAt).toISOString();
+        lastMessageTimestampRef.current = iso;
         setMessages((prev) => [
           ...prev,
           {
