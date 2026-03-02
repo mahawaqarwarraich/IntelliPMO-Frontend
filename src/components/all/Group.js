@@ -34,6 +34,7 @@ export default function Group() {
   const [fileName, setFileName] = useState('');
   const [fileType, setFileType] = useState('');
   const [sending, setSending] = useState(false);
+  const [uploading, setUploading] = useState(false);
   const [toast, setToast] = useState({ show: false, message: '', type: 'success' });
   const toastTimerRef = useRef(null);
   const fileInputRef = useRef(null);
@@ -141,6 +142,9 @@ export default function Group() {
           senderId: m.senderId,
           senderName: m.senderName ?? '',
           content: m.content ?? '',
+          fileUrl: m.fileUrl ?? '',
+          fileName: m.fileName ?? '',
+          fileType: m.fileType ?? '',
           createdAt: m.createdAt,
           createdAtTime: formatTime(m.createdAt),
           isOwn: String(m.senderId) === String(user?.id),
@@ -175,6 +179,9 @@ export default function Group() {
             senderId: m.senderId,
             senderName: m.senderName ?? '',
             content: m.content ?? '',
+            fileUrl: m.fileUrl ?? '',
+            fileName: m.fileName ?? '',
+            fileType: m.fileType ?? '',
             createdAt: m.createdAt,
             createdAtTime: formatTime(m.createdAt),
             isOwn: String(m.senderId) === String(user?.id),
@@ -255,6 +262,9 @@ export default function Group() {
             senderId: msg.senderId,
             senderName: msg.senderName ?? 'You',
             content: msg.content ?? text,
+            fileUrl: msg.fileUrl ?? '',
+            fileName: msg.fileName ?? '',
+            fileType: msg.fileType ?? '',
             createdAt,
             createdAtTime: formatTime(createdAt),
             isOwn: true,
@@ -273,10 +283,57 @@ export default function Group() {
 
   const handleFileChange = (e) => {
     const file = e.target.files?.[0];
-    if (!file) return;
-    setFileName(file.name);
-    setFileType(file.type?.startsWith('image/') ? 'image' : file.type || 'file');
     e.target.value = '';
+    if (!file || !user?.id || !groupId) return;
+    setUploading(true);
+    const formData = new FormData();
+    formData.append('file', file);
+    api
+      .post('/api/upload', formData)
+      .then((uploadRes) => {
+        const { filePath, fileName: uploadedFileName, fileType: uploadedFileType } = uploadRes.data || {};
+        if (!filePath) {
+          showToast('Upload did not return a file path.', 'error');
+          setUploading(false);
+          return;
+        }
+        return api
+          .post('/api/messages', {
+            groupId,
+            senderId: user.id,
+            filePath,
+            fileName: uploadedFileName ?? file.name,
+            fileType: uploadedFileType ?? file.type ?? '',
+          })
+          .then((msgRes) => {
+            const msg = msgRes.data?.message;
+            if (!msg) return;
+            const createdAt = msg.createdAt || new Date().toISOString();
+            const iso = typeof createdAt === 'string' ? createdAt : new Date(createdAt).toISOString();
+            lastMessageTimestampRef.current = iso;
+            setMessages((prev) => [
+              ...prev,
+              {
+                id: msg._id,
+                groupId: msg.groupId,
+                senderId: msg.senderId,
+                senderName: msg.senderName ?? 'You',
+                content: msg.content ?? '',
+                fileUrl: msg.fileUrl ?? filePath,
+                fileName: msg.fileName ?? uploadedFileName ?? '',
+                fileType: msg.fileType ?? uploadedFileType ?? '',
+                createdAt,
+                createdAtTime: formatTime(createdAt),
+                isOwn: true,
+              },
+            ]);
+          });
+      })
+      .catch((err) => {
+        const msg = err.response?.data?.message ?? err.message ?? 'Upload failed.';
+        showToast(msg, 'error');
+      })
+      .finally(() => setUploading(false));
   };
 
   if (loading) {
@@ -359,7 +416,26 @@ export default function Group() {
                         {m.senderName}
                       </p>
                     )}
-                    <p className="whitespace-pre-wrap break-words">{m.content}</p>
+                    {m.content ? (
+                      <p className="whitespace-pre-wrap break-words">{m.content}</p>
+                    ) : null}
+                    {m.fileUrl && (m.fileType || '').startsWith('image/') ? (
+                      <img
+                        src={m.fileUrl}
+                        alt={m.fileName || 'Image'}
+                        className="max-w-full rounded-lg mt-1 max-h-64 object-contain"
+                      />
+                    ) : m.fileUrl ? (
+                      <a
+                        href={m.fileUrl}
+                        download={m.fileName || undefined}
+                        className={`mt-1 block underline ${m.isOwn ? 'text-white/90' : 'text-accent'}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        Download {m.fileName || 'file'}
+                      </a>
+                    ) : null}
                     <p
                       className={`mt-1 text-[10px] ${m.isOwn ? 'text-white/80' : 'text-gray-400'}`}
                     >
@@ -379,12 +455,17 @@ export default function Group() {
         <button
           type="button"
           onClick={handleFileClick}
-          className="flex-shrink-0 w-9 h-9 rounded-full border border-gray-200 flex items-center justify-center text-gray-500 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-accent/20"
+          disabled={uploading}
+          className="flex-shrink-0 w-9 h-9 rounded-full border border-gray-200 flex items-center justify-center text-gray-500 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-accent/20 disabled:opacity-60 disabled:cursor-not-allowed"
           aria-label="Attach file"
         >
-          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-          </svg>
+          {uploading ? (
+            <div className="w-5 h-5 border-2 border-gray-300 border-t-gray-600 rounded-full animate-spin" aria-hidden />
+          ) : (
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+            </svg>
+          )}
         </button>
         <input
           ref={fileInputRef}
