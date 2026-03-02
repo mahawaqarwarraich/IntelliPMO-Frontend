@@ -31,8 +31,7 @@ export default function Group() {
   const [messages, setMessages] = useState([]);
   const [messagesLoading, setMessagesLoading] = useState(false);
   const [input, setInput] = useState('');
-  const [fileName, setFileName] = useState('');
-  const [fileType, setFileType] = useState('');
+  const [selectedFile, setSelectedFile] = useState(null);
   const [sending, setSending] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [toast, setToast] = useState({ show: false, message: '', type: 'success' });
@@ -243,40 +242,78 @@ export default function Group() {
 
   const handleSend = () => {
     const text = input.trim();
-    if (!text) return;
-    if (!user?.id) return;
-    setSending(true);
-    api
-      .post('/api/messages', { groupId, senderId: user.id, content: text })
-      .then((res) => {
-        const msg = res.data?.message;
-        if (!msg) return;
-        const createdAt = msg.createdAt || new Date().toISOString();
-        const iso = typeof createdAt === 'string' ? createdAt : new Date(createdAt).toISOString();
-        lastMessageTimestampRef.current = iso;
-        setMessages((prev) => [
-          ...prev,
-          {
-            id: msg._id,
-            groupId: msg.groupId,
-            senderId: msg.senderId,
-            senderName: msg.senderName ?? 'You',
-            content: msg.content ?? text,
-            fileUrl: msg.fileUrl ?? '',
-            fileName: msg.fileName ?? '',
-            fileType: msg.fileType ?? '',
-            createdAt,
-            createdAtTime: formatTime(createdAt),
-            isOwn: true,
-          },
-        ]);
-        setInput('');
-      })
-      .catch((err) => {
-        const msg = err.response?.data?.message ?? err.message ?? 'Failed to send message.';
-        showToast(msg, 'error');
-      })
-      .finally(() => setSending(false));
+    if (!user?.id || !groupId) return;
+    if (!text && !selectedFile) return;
+
+    const appendMessageAndClear = (msg) => {
+      if (!msg) return;
+      const createdAt = msg.createdAt || new Date().toISOString();
+      const iso = typeof createdAt === 'string' ? createdAt : new Date(createdAt).toISOString();
+      lastMessageTimestampRef.current = iso;
+      setMessages((prev) => [
+        ...prev,
+        {
+          id: msg._id,
+          groupId: msg.groupId,
+          senderId: msg.senderId,
+          senderName: msg.senderName ?? 'You',
+          content: msg.content ?? '',
+          fileUrl: msg.fileUrl ?? '',
+          fileName: msg.fileName ?? '',
+          fileType: msg.fileType ?? '',
+          createdAt,
+          createdAtTime: formatTime(createdAt),
+          isOwn: true,
+        },
+      ]);
+      setInput('');
+      setSelectedFile(null);
+    };
+
+    if (selectedFile) {
+      setUploading(true);
+      const formData = new FormData();
+      formData.append('file', selectedFile);
+      api
+        .post('/api/upload', formData)
+        .then((uploadRes) => {
+          const { filePath, fileName: uploadedFileName, fileType: uploadedFileType } = uploadRes.data || {};
+          if (!filePath) {
+            showToast('Upload did not return a file path.', 'error');
+            return;
+          }
+          return api.post('/api/messages', {
+            groupId,
+            senderId: user.id,
+            content: text || '',
+            filePath,
+            fileName: uploadedFileName ?? selectedFile.name,
+            fileType: uploadedFileType ?? selectedFile.type ?? '',
+          });
+        })
+        .then((msgRes) => {
+          if (msgRes?.data?.message) appendMessageAndClear(msgRes.data.message);
+        })
+        .catch((err) => {
+          const msg = err.response?.data?.message ?? err.message ?? 'Upload failed.';
+          showToast(msg, 'error');
+        })
+        .finally(() => {
+          setUploading(false);
+        });
+    } else {
+      setSending(true);
+      api
+        .post('/api/messages', { groupId, senderId: user.id, content: text })
+        .then((res) => {
+          if (res.data?.message) appendMessageAndClear(res.data.message);
+        })
+        .catch((err) => {
+          const msg = err.response?.data?.message ?? err.message ?? 'Failed to send message.';
+          showToast(msg, 'error');
+        })
+        .finally(() => setSending(false));
+    }
   };
 
   const handleFileClick = () => fileInputRef.current?.click();
@@ -284,57 +321,10 @@ export default function Group() {
   const handleFileChange = (e) => {
     const file = e.target.files?.[0];
     e.target.value = '';
-    if (!file || !user?.id || !groupId) return;
-    setUploading(true);
-    const formData = new FormData();
-    formData.append('file', file);
-    api
-      .post('/api/upload', formData)
-      .then((uploadRes) => {
-        const { filePath, fileName: uploadedFileName, fileType: uploadedFileType } = uploadRes.data || {};
-        if (!filePath) {
-          showToast('Upload did not return a file path.', 'error');
-          setUploading(false);
-          return;
-        }
-        return api
-          .post('/api/messages', {
-            groupId,
-            senderId: user.id,
-            filePath,
-            fileName: uploadedFileName ?? file.name,
-            fileType: uploadedFileType ?? file.type ?? '',
-          })
-          .then((msgRes) => {
-            const msg = msgRes.data?.message;
-            if (!msg) return;
-            const createdAt = msg.createdAt || new Date().toISOString();
-            const iso = typeof createdAt === 'string' ? createdAt : new Date(createdAt).toISOString();
-            lastMessageTimestampRef.current = iso;
-            setMessages((prev) => [
-              ...prev,
-              {
-                id: msg._id,
-                groupId: msg.groupId,
-                senderId: msg.senderId,
-                senderName: msg.senderName ?? 'You',
-                content: msg.content ?? '',
-                fileUrl: msg.fileUrl ?? filePath,
-                fileName: msg.fileName ?? uploadedFileName ?? '',
-                fileType: msg.fileType ?? uploadedFileType ?? '',
-                createdAt,
-                createdAtTime: formatTime(createdAt),
-                isOwn: true,
-              },
-            ]);
-          });
-      })
-      .catch((err) => {
-        const msg = err.response?.data?.message ?? err.message ?? 'Upload failed.';
-        showToast(msg, 'error');
-      })
-      .finally(() => setUploading(false));
+    if (file) setSelectedFile(file);
   };
+
+  const clearSelectedFile = () => setSelectedFile(null);
 
   if (loading) {
     return (
@@ -416,25 +406,40 @@ export default function Group() {
                         {m.senderName}
                       </p>
                     )}
+                    {m.fileUrl ? (
+                      <div className="mb-1">
+                        {(m.fileType || '').startsWith('image/') ? (
+                          <>
+                            <img
+                              src={m.fileUrl}
+                              alt={m.fileName || 'Image'}
+                              className="max-w-full rounded-lg max-h-64 object-contain block"
+                            />
+                            <a
+                              href={m.fileUrl}
+                              download={m.fileName || undefined}
+                              className={`mt-1 inline-block text-xs font-medium underline ${m.isOwn ? 'text-white/90' : 'text-accent'}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                            >
+                              Download
+                            </a>
+                          </>
+                        ) : (
+                          <a
+                            href={m.fileUrl}
+                            download={m.fileName || undefined}
+                            className={`block underline ${m.isOwn ? 'text-white/90' : 'text-accent'}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                          >
+                            download {m.fileName || 'file'}
+                          </a>
+                        )}
+                      </div>
+                    ) : null}
                     {m.content ? (
                       <p className="whitespace-pre-wrap break-words">{m.content}</p>
-                    ) : null}
-                    {m.fileUrl && (m.fileType || '').startsWith('image/') ? (
-                      <img
-                        src={m.fileUrl}
-                        alt={m.fileName || 'Image'}
-                        className="max-w-full rounded-lg mt-1 max-h-64 object-contain"
-                      />
-                    ) : m.fileUrl ? (
-                      <a
-                        href={m.fileUrl}
-                        download={m.fileName || undefined}
-                        className={`mt-1 block underline ${m.isOwn ? 'text-white/90' : 'text-accent'}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                      >
-                        Download {m.fileName || 'file'}
-                      </a>
                     ) : null}
                     <p
                       className={`mt-1 text-[10px] ${m.isOwn ? 'text-white/80' : 'text-gray-400'}`}
@@ -474,8 +479,23 @@ export default function Group() {
           onChange={handleFileChange}
         />
         <div className="flex-1 min-w-0 flex flex-col gap-1">
-          {fileName && (
-            <p className="text-[11px] text-gray-500 truncate">Attached: {fileName}</p>
+          {selectedFile && (
+            <div className="flex items-center gap-1.5 flex-wrap">
+              <span className="inline-flex items-center gap-1.5 px-2 py-1 rounded-md bg-gray-100 text-gray-700 text-xs max-w-full min-w-0">
+                <span className="truncate">{selectedFile.name}</span>
+                <button
+                  type="button"
+                  onClick={clearSelectedFile}
+                  className="flex-shrink-0 w-4 h-4 rounded-full flex items-center justify-center text-gray-500 hover:bg-gray-200 hover:text-gray-700 focus:outline-none"
+                  aria-label="Remove file"
+                >
+                  <span className="sr-only">Remove</span>
+                  <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </span>
+            </div>
           )}
           <textarea
             rows={1}
@@ -494,13 +514,17 @@ export default function Group() {
         <button
           type="button"
           onClick={handleSend}
-          disabled={!input.trim() || sending}
+          disabled={(!input.trim() && !selectedFile) || sending || uploading}
           className="flex-shrink-0 w-9 h-9 rounded-full bg-accent text-white flex items-center justify-center hover:bg-accent-hover focus:outline-none focus:ring-2 focus:ring-accent/30 disabled:opacity-60 disabled:cursor-not-allowed"
           aria-label="Send"
         >
-          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4l16 8-16 8 4-8-4-8z" />
-          </svg>
+          {uploading ? (
+            <div className="w-5 h-5 border-2 border-white/50 border-t-white rounded-full animate-spin" aria-hidden />
+          ) : (
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4l16 8-16 8 4-8-4-8z" />
+            </svg>
+          )}
         </button>
       </div>
     </div>
