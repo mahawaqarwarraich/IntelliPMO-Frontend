@@ -39,6 +39,7 @@ export const sidebarLinks = {
     { label: 'Request Status', path: '/dashboard/request-status', icon: 'file' },
     { label: 'Complete FYP guide/lifecycle', path: '/dashboard/fyp-guide', icon: 'file' },
     { label: 'All Supervisor Meetings', path: '/dashboard/meetings', icon: 'calendar' },
+    { label: 'All meetings', path: '/dashboard/all-meetings', icon: 'calendar' },
     { label: 'Supervisor Allocation Status', path: '/dashboard/supervisor-allocation', icon: 'users' },
     { label: 'Groups & Evaluation Panels (defense 1)', path: '/dashboard/groups-defense1', icon: 'users' },
     { label: 'Groups and Evaluation Panels (defense 2)', path: '/dashboard/groups-defense2', icon: 'users' },
