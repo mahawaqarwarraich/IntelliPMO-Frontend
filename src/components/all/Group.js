@@ -326,6 +326,23 @@ export default function Group() {
 
   const clearSelectedFile = () => setSelectedFile(null);
 
+  const handleDownload = async (filePath, fileName) => {
+    try {
+      const response = await fetch(filePath);
+      const blob = await response.blob();
+      const blobUrl = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = blobUrl;
+      link.download = fileName || 'download';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(blobUrl);
+    } catch (err) {
+      showToast(err?.message ?? 'Download failed.', 'error');
+    }
+  };
+
   if (loading) {
     return (
       <div className="max-w-4xl mx-auto mt-6">
@@ -415,15 +432,13 @@ export default function Group() {
                               alt={m.fileName || 'Image'}
                               className="max-w-full rounded-lg max-h-64 object-contain block"
                             />
-                            <a
-                              href={m.fileUrl}
-                              download={m.fileName || undefined}
-                              className={`mt-1 inline-block text-xs font-medium underline ${m.isOwn ? 'text-white/90' : 'text-accent'}`}
-                              target="_blank"
-                              rel="noopener noreferrer"
+                            <button
+                              type="button"
+                              onClick={() => handleDownload(m.fileUrl, m.fileName || 'image')}
+                              className={`mt-1 inline-block text-xs font-medium underline bg-transparent border-0 p-0 cursor-pointer ${m.isOwn ? 'text-white/90' : 'text-accent'}`}
                             >
                               Download
-                            </a>
+                            </button>
                           </>
                         ) : (
                           <a
