@@ -27,6 +27,7 @@ import ChatRoom from './components/all/ChatRoom';
 import Group from './components/all/Group';
 import MyGroup from './components/supervisor/MyGroup';
 import CreateMeeting from './components/supervisor/CreateMeeting';
+import AllMeetings from './components/all/AllMeetings';
 
 function App() {
   return (
@@ -72,7 +73,7 @@ function App() {
         <Route path="fyp-guide" element={<DashboardPlaceholder />} />
         <Route path="meetings" element={<DashboardPlaceholder />} />
         <Route path="create-meeting" element={<CreateMeeting />} />
-        <Route path="all-meetings" element={<DashboardPlaceholder />} />
+        <Route path="all-meetings" element={<AllMeetings />} />
         <Route path="allocation-status" element={<DashboardPlaceholder />} />
         <Route path="assigned-groups" element={<DashboardPlaceholder />} />
       </Route>
