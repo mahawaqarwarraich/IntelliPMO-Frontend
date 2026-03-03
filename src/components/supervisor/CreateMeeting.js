@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { api } from '../../api/client';
 
@@ -7,18 +7,13 @@ const inputClass =
 const labelClass = 'text-[13px] font-medium text-gray-900';
 const fieldWrapClass = 'flex flex-col gap-1.5 min-w-0';
 
-// Placeholder groups until API is connected
-const MOCK_GROUPS = [
-  { _id: '1', ideaName: 'Smart Attendance System' },
-  { _id: '2', ideaName: 'Campus Navigation App' },
-  { _id: '3', ideaName: 'E-Learning Platform' },
-];
-
 export default function CreateMeeting() {
   const { user } = useAuth();
   const [loading, setLoading] = useState(true);
   const [sessionOk, setSessionOk] = useState(false);
-  const [groups, setGroups] = useState(MOCK_GROUPS);
+  const [groups, setGroups] = useState([]);
+  const [toast, setToast] = useState({ show: false, message: '', type: 'success' });
+  const toastTimerRef = useRef(null);
 
   const [meetingTitle, setMeetingTitle] = useState('');
   const [groupId, setGroupId] = useState('');
@@ -26,10 +21,21 @@ export default function CreateMeeting() {
   const [meetingLocation, setMeetingLocation] = useState('');
   const [startingTime, setStartingTime] = useState('');
   const [endingTime, setEndingTime] = useState('');
+  const [submitting, setSubmitting] = useState(false);
+
+  const showToast = useCallback((message, type = 'success') => {
+    if (toastTimerRef.current) clearTimeout(toastTimerRef.current);
+    setToast({ show: true, message, type });
+    toastTimerRef.current = setTimeout(() => {
+      setToast((t) => ({ ...t, show: false }));
+      toastTimerRef.current = null;
+    }, 3000);
+  }, []);
 
   useEffect(() => {
     setLoading(true);
     setSessionOk(false);
+    setGroups([]);
 
     if (!user?.token || user?.role !== 'Supervisor') {
       setLoading(false);
@@ -46,7 +52,10 @@ export default function CreateMeeting() {
           return;
         }
         setSessionOk(true);
-        // TODO: fetch supervisor's groups and setGroups(res.data.groups)
+        return api.get('/api/supervisor/groups/own');
+      })
+      .then((res) => {
+        if (res?.data?.groups != null) setGroups(res.data.groups);
       })
       .catch(() => setSessionOk(false))
       .finally(() => setLoading(false));
@@ -54,7 +63,31 @@ export default function CreateMeeting() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    // API integration later
+    if (!groupId || !meetingTitle.trim() || !meetingDate || !meetingLocation.trim() || !startingTime || !endingTime) return;
+    setSubmitting(true);
+    api
+      .post('/api/meetings', {
+        group_id: groupId,
+        meetingTitle: meetingTitle.trim(),
+        meetingDate,
+        meetingLocation: meetingLocation.trim(),
+        startingTime,
+        endingTime,
+      })
+      .then(() => {
+        showToast('Meeting created successfully.', 'success');
+        setMeetingTitle('');
+        setGroupId('');
+        setMeetingDate('');
+        setMeetingLocation('');
+        setStartingTime('');
+        setEndingTime('');
+      })
+      .catch((err) => {
+        const msg = err.response?.data?.message ?? err.message ?? 'Failed to create meeting.';
+        showToast(msg, 'error');
+      })
+      .finally(() => setSubmitting(false));
   };
 
   if (loading) {
@@ -181,13 +214,25 @@ export default function CreateMeeting() {
           <div className="pt-2">
             <button
               type="submit"
+              disabled={submitting}
               className="w-full sm:w-auto py-2.5 px-6 bg-accent text-white border-0 rounded-md font-semibold text-[15px] cursor-pointer transition-colors hover:bg-accent-hover focus:outline-none focus:ring-[3px] focus:ring-accent/30 disabled:opacity-70 disabled:cursor-not-allowed"
             >
-              Create meeting
+              {submitting ? 'Creating…' : 'Create meeting'}
             </button>
           </div>
         </form>
       </div>
+      {toast.show && (
+        <div
+          className={`fixed bottom-6 left-1/2 -translate-x-1/2 z-50 px-4 py-2 rounded-lg text-white text-sm font-medium shadow-lg ${
+            toast.type === 'success' ? 'bg-green-600' : 'bg-red-600'
+          }`}
+          style={{ animation: 'toast-fade-in 0.25s ease-out' }}
+          role="alert"
+        >
+          <span>{toast.message}</span>
+        </div>
+      )}
     </div>
   );
 }
