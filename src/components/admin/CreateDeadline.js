@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useState, useRef, useCallback } from 'react';
+import { api } from '../../api/client';
 
 const inputClass =
   'w-full min-w-0 py-2.5 px-3 border border-gray-200 rounded-md bg-white text-gray-900 placeholder-gray-500 transition-colors focus:outline-none focus:border-accent focus:ring-[3px] focus:ring-accent/20';
@@ -10,10 +11,42 @@ export default function CreateDeadline() {
   const [dueDate, setDueDate] = useState('');
   const [dueTime, setDueTime] = useState('');
   const [description, setDescription] = useState('');
+  const [submitting, setSubmitting] = useState(false);
+  const [toast, setToast] = useState({ show: false, message: '', type: 'success' });
+  const toastTimerRef = useRef(null);
+
+  const showToast = useCallback((message, type = 'success') => {
+    if (toastTimerRef.current) clearTimeout(toastTimerRef.current);
+    setToast({ show: true, message, type });
+    toastTimerRef.current = setTimeout(() => {
+      setToast((t) => ({ ...t, show: false }));
+      toastTimerRef.current = null;
+    }, 3000);
+  }, []);
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    // API integration later
+    if (!deadlineName.trim() || !dueDate || !dueTime.trim()) return;
+    setSubmitting(true);
+    api
+      .post('/api/deadlines', {
+        deadlineName: deadlineName.trim(),
+        dueDate,
+        dueTime: dueTime.trim(),
+        description: description?.trim() ?? '',
+      })
+      .then(() => {
+        showToast('Deadline created successfully.', 'success');
+        setDeadlineName('');
+        setDueDate('');
+        setDueTime('');
+        setDescription('');
+      })
+      .catch((err) => {
+        const msg = err.response?.data?.message ?? err.message ?? 'Failed to create deadline.';
+        showToast(msg, 'error');
+      })
+      .finally(() => setSubmitting(false));
   };
 
   return (
@@ -84,12 +117,24 @@ export default function CreateDeadline() {
           <div className="pt-2">
             <button
               type="submit"
+              disabled={submitting}
               className="w-full sm:w-auto py-2.5 px-6 bg-accent text-white border-0 rounded-md font-semibold text-[15px] cursor-pointer transition-colors hover:bg-accent-hover focus:outline-none focus:ring-[3px] focus:ring-accent/30 disabled:opacity-70 disabled:cursor-not-allowed"
             >
-              Create deadline
+              {submitting ? 'Creating…' : 'Create deadline'}
             </button>
           </div>
         </form>
+
+        {toast.show && (
+          <div
+            className={`fixed bottom-6 left-1/2 -translate-x-1/2 px-4 py-2 rounded-lg text-white text-sm font-medium z-50 ${
+              toast.type === 'success' ? 'bg-green-600' : 'bg-red-600'
+            }`}
+            style={{ animation: 'toast-fade-in 0.25s ease-out' }}
+          >
+            <span>{toast.message}</span>
+          </div>
+        )}
       </div>
     </div>
   );
