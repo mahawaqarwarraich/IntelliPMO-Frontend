@@ -25,6 +25,7 @@ export const sidebarLinks = {
     { label: 'Supervisor Allocation Status', path: '/dashboard/supervisor-allocation', icon: 'users' },
     { label: 'Group Requests', path: '/dashboard/admin/group-requests', icon: 'file' },
     { label: 'All registered groups', path: '/dashboard/all-groups', icon: 'users' },
+    { label: 'Create deadline', path: '/dashboard/create-deadline', icon: 'calendar' },
     { label: 'Give Marks', path: '/dashboard/give-marks', icon: 'file' },
   ],
   student: [
