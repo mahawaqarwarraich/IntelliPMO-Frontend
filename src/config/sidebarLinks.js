@@ -26,6 +26,7 @@ export const sidebarLinks = {
     { label: 'Group Requests', path: '/dashboard/admin/group-requests', icon: 'file' },
     { label: 'All registered groups', path: '/dashboard/all-groups', icon: 'users' },
     { label: 'Create deadline', path: '/dashboard/create-deadline', icon: 'calendar' },
+    { label: 'All deadlines', path: '/dashboard/all-deadlines', icon: 'calendar' },
     { label: 'Give Marks', path: '/dashboard/give-marks', icon: 'file' },
   ],
   student: [
@@ -45,6 +46,7 @@ export const sidebarLinks = {
     { label: 'Groups & Evaluation Panels (defense 1)', path: '/dashboard/groups-defense1', icon: 'users' },
     { label: 'Groups and Evaluation Panels (defense 2)', path: '/dashboard/groups-defense2', icon: 'users' },
     { label: 'All registered groups', path: '/dashboard/all-groups', icon: 'users' },
+    { label: 'All deadlines', path: '/dashboard/all-deadlines', icon: 'calendar' },
   ],
   supervisor: [
     { label: 'Chat rooms', path: '/dashboard/chat-rooms', icon: 'message' },
