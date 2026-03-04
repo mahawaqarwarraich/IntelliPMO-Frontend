@@ -54,7 +54,7 @@ export const sidebarLinks = {
     { label: 'FYP Events', path: '/dashboard/fyp-events', icon: 'calendar' },
     { label: 'Create Meeting', path: '/dashboard/create-meeting', icon: 'calendar' },
     { label: 'All Meetings', path: '/dashboard/all-meetings', icon: 'calendar' },
-    { label: 'Supervisor Allocation Status', path: '/dashboard/allocation-status', icon: 'users' },
+    { label: 'Supervisor Allocation Status', path: '/dashboard/supervisor-allocation', icon: 'users' },
     { label: 'Group Requests', path: '/dashboard/supervisor/group-requests', icon: 'file' },
     { label: 'My groups', path: '/dashboard/my-groups', icon: 'users' },
     { label: 'Groups and Evaluation Panels (defense 1)', path: '/dashboard/groups-defense1', icon: 'users' },
