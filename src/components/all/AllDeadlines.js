@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { api } from '../../api/client';
 
@@ -28,6 +28,57 @@ export default function AllDeadlines() {
   const [sessionOk, setSessionOk] = useState(false);
   const [deadlines, setDeadlines] = useState([]);
   const [error, setError] = useState('');
+  const [selectedFiles, setSelectedFiles] = useState({});
+  const [submittingId, setSubmittingId] = useState(null);
+  const [toast, setToast] = useState({ show: false, message: '', type: 'success' });
+  const toastTimerRef = useRef(null);
+  const fileInputRefs = useRef({});
+
+  const showToast = useCallback((message, type = 'success') => {
+    if (toastTimerRef.current) clearTimeout(toastTimerRef.current);
+    setToast({ show: true, message, type });
+    toastTimerRef.current = setTimeout(() => {
+      setToast((t) => ({ ...t, show: false }));
+      toastTimerRef.current = null;
+    }, 3000);
+  }, []);
+
+  const handleFileChange = useCallback((deadlineId, file) => {
+    setSelectedFiles((prev) => ({ ...prev, [deadlineId]: file || null }));
+  }, []);
+
+  const handleSubmit = useCallback(
+    async (d) => {
+      const file = selectedFiles[d._id];
+      if (!file) {
+        showToast('Please attach a file before submitting.', 'error');
+        return;
+      }
+      setSubmittingId(d._id);
+      try {
+        const formData = new FormData();
+        formData.append('file', file);
+        const uploadRes = await api.post('/api/upload', formData);
+        const { filePath, fileName } = uploadRes.data;
+        await api.post('/api/submissions', {
+          deadline_id: d._id,
+          fileUrl: filePath,
+          fileName,
+          submittedAt: new Date().toISOString(),
+        });
+        showToast('Submission uploaded successfully.', 'success');
+        setSelectedFiles((prev) => ({ ...prev, [d._id]: null }));
+        const inputEl = fileInputRefs.current[d._id];
+        if (inputEl) inputEl.value = '';
+      } catch (err) {
+        const msg = err.response?.data?.message ?? err.message ?? 'Submission failed.';
+        showToast(msg, 'error');
+      } finally {
+        setSubmittingId(null);
+      }
+    },
+    [selectedFiles, showToast]
+  );
 
   useEffect(() => {
     let cancelled = false;
@@ -155,21 +206,41 @@ export default function AllDeadlines() {
                   Upload file (doc, pdf, ppt)
                 </label>
                 <input
+                  ref={(el) => { fileInputRefs.current[d._id] = el; }}
                   type="file"
                   className="block w-full text-sm text-gray-900 file:mr-3 file:py-1.5 file:px-3 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-accent file:text-white hover:file:bg-accent-hover"
                   accept=".doc,.docx,.pdf,.ppt,.pptx"
+                  onChange={(e) => handleFileChange(d._id, e.target.files?.[0])}
                 />
+                {selectedFiles[d._id] && (
+                  <p className="mt-1 text-xs text-gray-600">
+                    Selected: {selectedFiles[d._id].name}
+                  </p>
+                )}
                 <div className="mt-3">
                   <button
                     type="button"
-                    className="py-2.5 px-6 bg-accent text-white border-0 rounded-md font-semibold text-[15px] cursor-pointer transition-colors hover:bg-accent-hover focus:outline-none focus:ring-[3px] focus:ring-accent/30"
+                    disabled={submittingId === d._id}
+                    onClick={() => handleSubmit(d)}
+                    className="py-2.5 px-6 bg-accent text-white border-0 rounded-md font-semibold text-[15px] cursor-pointer transition-colors hover:bg-accent-hover focus:outline-none focus:ring-[3px] focus:ring-accent/30 disabled:opacity-70 disabled:cursor-not-allowed"
                   >
-                    Submit
+                    {submittingId === d._id ? 'Submitting…' : 'Submit'}
                   </button>
                 </div>
               </div>
             </div>
           ))}
+        </div>
+      )}
+
+      {toast.show && (
+        <div
+          className={`fixed bottom-6 left-1/2 -translate-x-1/2 px-4 py-2 rounded-lg text-white text-sm font-medium z-50 ${
+            toast.type === 'success' ? 'bg-green-600' : 'bg-red-600'
+          }`}
+          style={{ animation: 'toast-fade-in 0.25s ease-out' }}
+        >
+          <span>{toast.message}</span>
         </div>
       )}
     </div>
