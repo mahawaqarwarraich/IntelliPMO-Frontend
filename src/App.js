@@ -30,6 +30,7 @@ import CreateMeeting from './components/supervisor/CreateMeeting';
 import AllMeetings from './components/all/AllMeetings';
 import CreateDeadline from './components/admin/CreateDeadline';
 import AllDeadlines from './components/all/AllDeadlines';
+import AllSubmissions from './components/all/AllSubmissions';
 
 function App() {
   return (
@@ -78,6 +79,7 @@ function App() {
         <Route path="all-meetings" element={<AllMeetings />} />
         <Route path="create-deadline" element={<CreateDeadline />} />
         <Route path="all-deadlines" element={<AllDeadlines />} />
+        <Route path="all-submissions" element={<AllSubmissions />} />
         <Route path="allocation-status" element={<DashboardPlaceholder />} />
         <Route path="assigned-groups" element={<DashboardPlaceholder />} />
       </Route>

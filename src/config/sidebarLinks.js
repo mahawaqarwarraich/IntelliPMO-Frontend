@@ -27,6 +27,7 @@ export const sidebarLinks = {
     { label: 'All registered groups', path: '/dashboard/all-groups', icon: 'users' },
     { label: 'Create deadline', path: '/dashboard/create-deadline', icon: 'calendar' },
     { label: 'All deadlines', path: '/dashboard/all-deadlines', icon: 'calendar' },
+    { label: 'All submissions', path: '/dashboard/all-submissions', icon: 'file' },
     { label: 'Give Marks', path: '/dashboard/give-marks', icon: 'file' },
   ],
   student: [
