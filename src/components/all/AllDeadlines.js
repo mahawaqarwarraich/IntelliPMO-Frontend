@@ -9,6 +9,19 @@ function formatDate(dateStr) {
   return d.toLocaleDateString([], { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' });
 }
 
+/** Converts 24h time string (e.g. "14:30") to 12h with AM/PM (e.g. "2:30 PM"). */
+function formatTimeWithAmPm(timeStr) {
+  if (!timeStr || typeof timeStr !== 'string') return '—';
+  const [hStr, mStr] = timeStr.trim().split(':');
+  const h = parseInt(hStr, 10);
+  const m = mStr != null ? parseInt(mStr, 10) : 0;
+  if (Number.isNaN(h)) return timeStr;
+  const hour12 = h === 0 ? 12 : h > 12 ? h - 12 : h;
+  const ampm = h < 12 ? 'AM' : 'PM';
+  const min = Number.isNaN(m) ? '00' : String(m).padStart(2, '0');
+  return `${hour12}:${min} ${ampm}`;
+}
+
 export default function AllDeadlines() {
   const { user } = useAuth();
   const [loading, setLoading] = useState(true);
@@ -127,7 +140,7 @@ export default function AllDeadlines() {
                   <p className="text-xs text-gray-500 mt-0.5">
                     Due on {formatDate(d.dueDate)} at{' '}
                     <span className="font-medium">
-                      {d.dueTime || '—'}
+                      {formatTimeWithAmPm(d.dueTime)}
                     </span>
                   </p>
                 </div>
@@ -146,9 +159,14 @@ export default function AllDeadlines() {
                   className="block w-full text-sm text-gray-900 file:mr-3 file:py-1.5 file:px-3 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-accent file:text-white hover:file:bg-accent-hover"
                   accept=".doc,.docx,.pdf,.ppt,.pptx"
                 />
-                <p className="mt-1 text-[11px] text-gray-500">
-                  This is a frontend-only upload portal for now; backend handling will be wired later.
-                </p>
+                <div className="mt-3">
+                  <button
+                    type="button"
+                    className="py-2.5 px-6 bg-accent text-white border-0 rounded-md font-semibold text-[15px] cursor-pointer transition-colors hover:bg-accent-hover focus:outline-none focus:ring-[3px] focus:ring-accent/30"
+                  >
+                    Submit
+                  </button>
+                </div>
               </div>
             </div>
           ))}
