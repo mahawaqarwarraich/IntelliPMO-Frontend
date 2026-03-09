@@ -11,6 +11,7 @@ export const sidebarLinks = {
     { label: 'Manage evaluators', path: '/dashboard/manage-evaluators', icon: 'users' },
     { label: 'Manage domains', path: '/dashboard/manage-domains', icon: 'file' },
     { label: 'Manage Evaluator Panels', path: '/dashboard/evaluator-panels', icon: 'users' },
+    { label: 'Create panels for D1', path: '/dashboard/create-panels-d1', icon: 'users' },
     { label: 'All FYP sessions', path: '/dashboard/all-sessions', icon: 'calendar' },
     { label: 'All registered domains', path: '/dashboard/all-domains', icon: 'file' },
     { label: 'All registered supervisors', path: '/dashboard/all-supervisors', icon: 'users' },

@@ -50,6 +50,7 @@ function App() {
         <Route path="manage-evaluators" element={<ManageEvaluators />} />
         <Route path="manage-domains" element={<ManageDomains />} />
         <Route path="evaluator-panels" element={<DashboardPlaceholder />} />
+        <Route path="create-panels-d1" element={<DashboardPlaceholder />} />
         <Route path="all-sessions" element={<DashboardPlaceholder />} />
         <Route path="all-domains" element={<AllDomains />} />
         <Route path="all-supervisors" element={<DashboardPlaceholder />} />

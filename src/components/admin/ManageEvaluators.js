@@ -143,13 +143,14 @@ export default function ManageEvaluators() {
                 <th className="text-left py-3 px-4 text-sm font-semibold text-gray-700 w-20">#</th>
                 <th className="text-left py-3 px-4 text-sm font-semibold text-gray-700">Evaluator name</th>
                 <th className="text-left py-3 px-4 text-sm font-semibold text-gray-700">Email</th>
+                <th className="text-left py-3 px-4 text-sm font-semibold text-gray-700">Defense type</th>
                 <th className="text-right py-3 px-4 text-sm font-semibold text-gray-700 w-24">Action</th>
               </tr>
             </thead>
             <tbody>
               {evaluators.length === 0 ? (
                 <tr>
-                  <td colSpan={4} className="py-8 px-4 text-center text-gray-500 text-sm">
+                  <td colSpan={5} className="py-8 px-4 text-center text-gray-500 text-sm">
                     No evaluators found for the active session.
                   </td>
                 </tr>
@@ -159,6 +160,9 @@ export default function ManageEvaluators() {
                     <td className="py-3 px-4 text-sm text-gray-600">{evaluator.number}</td>
                     <td className="py-3 px-4 text-sm font-medium text-gray-900">{evaluator.evaluatorName}</td>
                     <td className="py-3 px-4 text-sm text-gray-600">{evaluator.email}</td>
+                    <td className="py-3 px-4 text-sm text-gray-600">
+                      {evaluator.defenseType === 'd1' ? 'D1' : evaluator.defenseType === 'd2' ? 'D2' : evaluator.defenseType ?? '—'}
+                    </td>
                     <td className="py-3 px-4 text-right">
                       <button
                         type="button"

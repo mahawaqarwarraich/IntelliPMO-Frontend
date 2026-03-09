@@ -7,6 +7,7 @@ const FIELD_NAMES = [
   'password',
   'confirmPassword',
   'session',
+  'defenseType',
   'designation',
 ];
 
@@ -130,6 +131,7 @@ export default function EvaluatorRegisterForm({ onBack, onSubmit, onLogin }) {
     delete payload.confirmPassword;
     payload.session_id = payload.session;
     delete payload.session;
+    if (!payload.defenseType) payload.defenseType = 'd1';
 
     setSubmitting(true);
     try {
@@ -155,6 +157,7 @@ export default function EvaluatorRegisterForm({ onBack, onSubmit, onLogin }) {
   const passwordError = getError({ name: 'password' }, touched);
   const confirmPasswordError = getError({ name: 'confirmPassword' }, touched);
   const sessionError = getError({ name: 'session' }, touched);
+  const defenseTypeError = getError({ name: 'defenseType' }, touched);
   const designationError = getError({ name: 'designation' }, touched);
 
   return (
@@ -333,6 +336,32 @@ export default function EvaluatorRegisterForm({ onBack, onSubmit, onLogin }) {
             {sessionError && (
               <span id="session-error" className={errorClass} role="alert">
                 {sessionError}
+              </span>
+            )}
+          </div>
+
+          <div className={fieldWrapClass}>
+            <label htmlFor="defenseType" className={labelClass}>
+              Defense type<span className="text-red-500 ml-0.5">*</span>
+            </label>
+            <select
+              id="defenseType"
+              name="defenseType"
+              value={values.defenseType ?? ''}
+              onChange={handleChange('defenseType')}
+              onBlur={handleBlur('defenseType')}
+              required
+              aria-invalid={!!defenseTypeError}
+              aria-describedby={defenseTypeError ? 'defenseType-error' : undefined}
+              className={selectClass}
+            >
+              <option value="">Select defense type</option>
+              <option value="d1">D1</option>
+              <option value="d2">D2</option>
+            </select>
+            {defenseTypeError && (
+              <span id="defenseType-error" className={errorClass} role="alert">
+                {defenseTypeError}
               </span>
             )}
           </div>
