@@ -31,6 +31,7 @@ import AllMeetings from './components/all/AllMeetings';
 import CreateDeadline from './components/admin/CreateDeadline';
 import AllDeadlines from './components/all/AllDeadlines';
 import AllSubmissions from './components/all/AllSubmissions';
+import CreatePanelsD1 from './components/admin/CreatePanelsD1';
 
 function App() {
   return (
@@ -50,7 +51,7 @@ function App() {
         <Route path="manage-evaluators" element={<ManageEvaluators />} />
         <Route path="manage-domains" element={<ManageDomains />} />
         <Route path="evaluator-panels" element={<DashboardPlaceholder />} />
-        <Route path="create-panels-d1" element={<DashboardPlaceholder />} />
+        <Route path="create-panels-d1" element={<CreatePanelsD1 />} />
         <Route path="all-sessions" element={<DashboardPlaceholder />} />
         <Route path="all-domains" element={<AllDomains />} />
         <Route path="all-supervisors" element={<DashboardPlaceholder />} />
