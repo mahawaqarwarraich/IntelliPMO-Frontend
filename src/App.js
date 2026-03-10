@@ -32,7 +32,7 @@ import CreateDeadline from './components/admin/CreateDeadline';
 import AllDeadlines from './components/all/AllDeadlines';
 import AllSubmissions from './components/all/AllSubmissions';
 import CreatePanelsD1 from './components/admin/CreatePanelsD1';
-
+import PanelAssignmentD1 from './components/admin/PanelAssignmentD1';
 function App() {
   return (
     <Routes>
@@ -52,6 +52,7 @@ function App() {
         <Route path="manage-domains" element={<ManageDomains />} />
         <Route path="evaluator-panels" element={<DashboardPlaceholder />} />
         <Route path="create-panels-d1" element={<CreatePanelsD1 />} />
+        <Route path="panel-assignment-d1" element={<PanelAssignmentD1 />} />
         <Route path="all-sessions" element={<DashboardPlaceholder />} />
         <Route path="all-domains" element={<AllDomains />} />
         <Route path="all-supervisors" element={<DashboardPlaceholder />} />
