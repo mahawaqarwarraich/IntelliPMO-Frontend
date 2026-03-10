@@ -34,6 +34,7 @@ import AllSubmissions from './components/all/AllSubmissions';
 import CreatePanelsD1 from './components/admin/CreatePanelsD1';
 import PanelAssignmentD1 from './components/admin/PanelAssignmentD1';
 import PanelsForD1 from './components/all/PanelsForD1';
+import PanelAndGroupD1 from './components/all/PanelAndGroupD1';
 
 function App() {
   return (
@@ -56,6 +57,7 @@ function App() {
         <Route path="create-panels-d1" element={<CreatePanelsD1 />} />
         <Route path="panel-assignment-d1" element={<PanelAssignmentD1 />} />
         <Route path="panels-d1" element={<PanelsForD1 />} />
+        <Route path="panel-and-group-d1" element={<PanelAndGroupD1 />} />
         <Route path="all-sessions" element={<DashboardPlaceholder />} />
         <Route path="all-domains" element={<AllDomains />} />
         <Route path="all-supervisors" element={<DashboardPlaceholder />} />

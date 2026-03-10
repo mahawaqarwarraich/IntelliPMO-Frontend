@@ -75,7 +75,7 @@ export default function PanelsForD1() {
     <div className="max-w-4xl mx-auto mt-6">
       <div className="mb-4">
         <h1 className="text-2xl font-semibold text-gray-900 mb-1">Panels for D1</h1>
-        <p className="text-sm text-gray-500">D1 panels and their members for the active session.</p>
+        <p className="text-sm text-gray-500">D1 panels, their members and assigned groups for the active session.</p>
       </div>
 
       {error ? (
@@ -98,6 +98,9 @@ export default function PanelsForD1() {
                   <th scope="col" className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
                     Members
                   </th>
+                  <th scope="col" className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                    Assigned Groups
+                  </th>
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-100">
@@ -109,6 +112,11 @@ export default function PanelsForD1() {
                     <td className="px-4 py-3 text-sm text-gray-700">
                       {Array.isArray(p.memberNames) && p.memberNames.length > 0
                         ? p.memberNames.join(', ')
+                        : '—'}
+                    </td>
+                    <td className="px-4 py-3 text-sm text-gray-700">
+                      {Array.isArray(p.assignedGroupNames) && p.assignedGroupNames.length > 0
+                        ? p.assignedGroupNames.join(', ')
                         : '—'}
                     </td>
                   </tr>
