@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { api } from '../../api/client';
 
@@ -7,6 +7,7 @@ export default function GiveD1Marks() {
   const [loading, setLoading] = useState(true);
   const [groups, setGroups] = useState([]);
   const [error, setError] = useState('');
+  const [ideaNameFilter, setIdeaNameFilter] = useState('');
 
   useEffect(() => {
     setLoading(true);
@@ -21,6 +22,12 @@ export default function GiveD1Marks() {
       })
       .finally(() => setLoading(false));
   }, []);
+
+  const filteredGroups = useMemo(() => {
+    const q = (ideaNameFilter || '').trim().toLowerCase();
+    if (!q) return groups;
+    return groups.filter((g) => (g.ideaName || '').toLowerCase().includes(q));
+  }, [groups, ideaNameFilter]);
 
   if (loading) {
     return (
@@ -58,13 +65,33 @@ export default function GiveD1Marks() {
         <p className="text-sm text-gray-500">Registered groups (overall status approved). Select a group to enter or view D1 marks.</p>
       </div>
 
+      {groups.length > 0 && (
+        <div className="mb-4">
+          <label htmlFor="idea-name-filter" className="block text-sm font-medium text-gray-700 mb-1">
+            Filter by idea name
+          </label>
+          <input
+            id="idea-name-filter"
+            type="text"
+            value={ideaNameFilter}
+            onChange={(e) => setIdeaNameFilter(e.target.value)}
+            placeholder="Type to filter…"
+            className="w-full max-w-md py-2 px-3 border border-gray-200 rounded-md bg-white text-gray-900 placeholder-gray-500 focus:outline-none focus:border-accent focus:ring-[3px] focus:ring-accent/20"
+          />
+        </div>
+      )}
+
       {groups.length === 0 ? (
         <div className="rounded-xl border border-gray-200 bg-white shadow-sm p-8 text-center text-gray-500">
           No registered groups in the active session.
         </div>
+      ) : filteredGroups.length === 0 ? (
+        <div className="rounded-xl border border-gray-200 bg-white shadow-sm p-8 text-center text-gray-500">
+          No groups match the filter.
+        </div>
       ) : (
         <div className="space-y-4">
-          {groups.map((g) => (
+          {filteredGroups.map((g) => (
             <div
               key={g._id}
               role="button"
