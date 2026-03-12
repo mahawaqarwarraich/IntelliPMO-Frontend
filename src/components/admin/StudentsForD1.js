@@ -61,6 +61,7 @@ export default function StudentsForD1() {
               <li key={s._id} className="p-4 hover:bg-gray-50/50">
                 <Link
                   to={`/dashboard/give-d1-marks/group/${groupId}/student/${s._id}`}
+                  state={{ rollNo: s.rollNo, fullName: s.fullName }}
                   className="text-accent font-medium hover:underline"
                 >
                   {s.rollNo}
