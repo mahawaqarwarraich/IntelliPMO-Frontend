@@ -31,11 +31,12 @@ export default function PanelAssignmentD1() {
     setError('');
     Promise.all([
       api.get('/api/panels', { params: { defenseType: 'd1' } }),
-      api.get('/api/groups/registered'),
+      api.get('/api/admin/groups/registered-unassigned'),
     ])
       .then(([panelsRes, groupsRes]) => {
         const panelList = Array.isArray(panelsRes.data?.panels) ? panelsRes.data.panels : [];
         const groupList = Array.isArray(groupsRes.data?.groups) ? groupsRes.data.groups : [];
+        console.log('GET /api/admin/groups/registered-unassigned result:', groupsRes.data);
         setPanels(panelList);
         setGroups(groupList);
       })
@@ -50,20 +51,7 @@ export default function PanelAssignmentD1() {
     loadData();
   }, [loadData]);
 
-  const assignedGroupIdSet = useMemo(() => {
-    const set = new Set();
-    (panels || []).forEach((p) => {
-      (p.assignedGroups || []).forEach((gId) => {
-        if (gId) set.add(String(gId));
-      });
-    });
-    return set;
-  }, [panels]);
-
-  const availableGroups = useMemo(() => {
-    if (!Array.isArray(groups)) return [];
-    return groups.filter((g) => !assignedGroupIdSet.has(String(g._id)));
-  }, [groups, assignedGroupIdSet]);
+  const availableGroups = useMemo(() => (Array.isArray(groups) ? groups : []), [groups]);
 
   const toggleGroup = useCallback((groupId) => {
     setSelectedGroupIds((prev) => {
