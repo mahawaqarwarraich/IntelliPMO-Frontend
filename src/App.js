@@ -34,6 +34,7 @@ import AllSubmissions from './components/all/AllSubmissions';
 import CreatePanelsD1 from './components/admin/CreatePanelsD1';
 import PanelAssignmentD1 from './components/admin/PanelAssignmentD1';
 import PanelsForD1 from './components/all/PanelsForD1';
+import GiveD1Marks from './components/admin/GiveD1Marks';
 
 function App() {
   return (
@@ -73,6 +74,7 @@ function App() {
         <Route path="supervisor/group-requests" element={<SupervisorGroupRequest />} />
         <Route path="my-groups" element={<MyGroup />} />
         <Route path="give-marks" element={<DashboardPlaceholder />} />
+        <Route path="give-d1-marks" element={<GiveD1Marks />} />
         <Route path="chat-rooms" element={<ChatRoom />}>
           <Route path=":groupId" element={<Group />} />
         </Route>

@@ -31,7 +31,7 @@ export const sidebarLinks = {
     { label: 'Create deadline', path: '/dashboard/create-deadline', icon: 'calendar' },
     { label: 'All deadlines', path: '/dashboard/all-deadlines', icon: 'calendar' },
     { label: 'All submissions', path: '/dashboard/all-submissions', icon: 'file' },
-    { label: 'Give Marks', path: '/dashboard/give-marks', icon: 'file' },
+    { label: 'Give D1 marks', path: '/dashboard/give-d1-marks', icon: 'file' },
   ],
   student: [
     { label: 'Chat rooms', path: '/dashboard/chat-rooms', icon: 'message' },
