@@ -36,6 +36,7 @@ import PanelAssignmentD1 from './components/admin/PanelAssignmentD1';
 import PanelsForD1 from './components/all/PanelsForD1';
 import GiveD1Marks from './components/admin/GiveD1Marks';
 import StudentsForD1 from './components/admin/StudentsForD1';
+import AdminD1EvaluationForm from './components/admin/AdminD1EvaluationForm';
 
 function App() {
   return (
@@ -77,7 +78,7 @@ function App() {
         <Route path="give-marks" element={<DashboardPlaceholder />} />
         <Route path="give-d1-marks" element={<GiveD1Marks />} />
         <Route path="give-d1-marks/group/:groupId" element={<StudentsForD1 />} />
-        <Route path="give-d1-marks/group/:groupId/student/:studentId" element={<DashboardPlaceholder />} />
+        <Route path="give-d1-marks/group/:groupId/student/:studentId" element={<AdminD1EvaluationForm />} />
         <Route path="chat-rooms" element={<ChatRoom />}>
           <Route path=":groupId" element={<Group />} />
         </Route>
