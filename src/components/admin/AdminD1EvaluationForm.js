@@ -51,7 +51,7 @@ export default function AdminD1EvaluationForm() {
 
     setSubmitting(true);
     try {
-      await api.patch(`/api/admin/d1-evaluation-form/${studentId}`, {
+      await api.patch(`/api/d1-evaluation-form/${studentId}`, {
         adminMarks10: numericMarks,
       });
       showToast('Marks saved successfully.', 'success');
@@ -111,10 +111,9 @@ export default function AdminD1EvaluationForm() {
           <button
             type="button"
             onClick={handleSubmit}
-            disabled={submitting}
-            className="py-2.5 px-6 bg-accent text-white border-0 rounded-md font-semibold text-[15px] cursor-pointer transition-colors hover:bg-accent-hover focus:outline-none focus:ring-[3px] focus:ring-accent/30 disabled:opacity-60 disabled:cursor-not-allowed"
+            className="py-2.5 px-6 bg-accent text-white border-0 rounded-md font-semibold text-[15px] cursor-pointer transition-colors hover:bg-accent-hover focus:outline-none focus:ring-[3px] focus:ring-accent/30"
           >
-            {submitting ? 'Saving…' : 'Submit marks'}
+            Submit marks
           </button>
         </div>
       </div>
