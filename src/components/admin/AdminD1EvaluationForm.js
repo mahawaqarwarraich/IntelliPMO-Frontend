@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState, useCallback } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
+import { api } from '../../api/client';
 
 export default function AdminD1EvaluationForm() {
   const { groupId, studentId } = useParams();
@@ -9,6 +10,7 @@ export default function AdminD1EvaluationForm() {
   const fullName = location.state?.fullName ?? '';
 
   const [marksOutOf10, setMarksOutOf10] = useState('');
+  const [submitting, setSubmitting] = useState(false);
   const [toast, setToast] = useState({ show: false, message: '', type: 'success' });
   const toastTimerRef = useRef(null);
 
@@ -33,7 +35,7 @@ export default function AdminD1EvaluationForm() {
     return Number.isFinite(n) ? n : null;
   }, [marksOutOf10]);
 
-  const handleSubmit = useCallback(() => {
+  const handleSubmit = useCallback(async () => {
     if (numericMarks == null) {
       showToast('Please enter marks out of 10.', 'error');
       return;
@@ -42,10 +44,24 @@ export default function AdminD1EvaluationForm() {
       showToast('Marks must be between 0 and 10.', 'error');
       return;
     }
+    if (!studentId) {
+      showToast('Student not found.', 'error');
+      return;
+    }
 
-    // Frontend-only for now (no API call).
-    showToast('Marks submitted (frontend only).', 'success');
-  }, [numericMarks, showToast]);
+    setSubmitting(true);
+    try {
+      await api.patch(`/api/admin/d1-evaluation-form/${studentId}`, {
+        adminMarks10: numericMarks,
+      });
+      showToast('Marks saved successfully.', 'success');
+    } catch (err) {
+      const msg = err.response?.data?.message || err.message || 'Failed to save marks.';
+      showToast(msg, 'error');
+    } finally {
+      setSubmitting(false);
+    }
+  }, [numericMarks, studentId, showToast]);
 
   return (
     <div className="max-w-4xl mx-auto mt-6">
@@ -95,9 +111,10 @@ export default function AdminD1EvaluationForm() {
           <button
             type="button"
             onClick={handleSubmit}
-            className="py-2.5 px-6 bg-accent text-white border-0 rounded-md font-semibold text-[15px] cursor-pointer transition-colors hover:bg-accent-hover focus:outline-none focus:ring-[3px] focus:ring-accent/30"
+            disabled={submitting}
+            className="py-2.5 px-6 bg-accent text-white border-0 rounded-md font-semibold text-[15px] cursor-pointer transition-colors hover:bg-accent-hover focus:outline-none focus:ring-[3px] focus:ring-accent/30 disabled:opacity-60 disabled:cursor-not-allowed"
           >
-            Submit marks
+            {submitting ? 'Saving…' : 'Submit marks'}
           </button>
         </div>
       </div>
