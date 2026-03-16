@@ -1,10 +1,13 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { api } from '../../api/client';
+import { useAuth } from '../../context/AuthContext';
 
 export default function StudentsForD1() {
   const { groupId } = useParams();
   const navigate = useNavigate();
+  const { user } = useAuth();
+  const isAdmin = user?.role === 'Admin';
   const [loading, setLoading] = useState(true);
   const [students, setStudents] = useState([]);
   const [error, setError] = useState('');
@@ -58,15 +61,25 @@ export default function StudentsForD1() {
         <div className="rounded-xl border border-gray-200 bg-white shadow-sm overflow-hidden">
           <ul className="divide-y divide-gray-100">
             {students.map((s) => (
-              <li key={s._id} className="p-4 hover:bg-gray-50/50">
-                <Link
-                  to={`/dashboard/give-d1-marks/group/${groupId}/student/${s._id}`}
-                  state={{ rollNo: s.rollNo, fullName: s.fullName }}
-                  className="text-accent font-medium hover:underline"
-                >
-                  {s.rollNo}
-                </Link>
-                <span className="text-gray-600 ml-2">{s.fullName}</span>
+              <li key={s._id} className="p-4 hover:bg-gray-50/50 flex items-center justify-between">
+                <div>
+                  <Link
+                    to={`/dashboard/give-d1-marks/group/${groupId}/student/${s._id}`}
+                    state={{ rollNo: s.rollNo, fullName: s.fullName }}
+                    className="text-accent font-medium hover:underline"
+                  >
+                    {s.rollNo}
+                  </Link>
+                  <span className="text-gray-600 ml-2">{s.fullName}</span>
+                </div>
+                {isAdmin && s.adminD1Marks && (
+                  <span
+                    className="inline-flex items-center text-green-600 text-sm font-medium"
+                    title="Admin D1 marks recorded"
+                  >
+                    ✓
+                  </span>
+                )}
               </li>
             ))}
           </ul>
