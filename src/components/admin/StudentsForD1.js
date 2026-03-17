@@ -20,7 +20,7 @@ export default function StudentsForD1() {
     setLoading(true);
     setError('');
     api
-      .get(`/api/admin/groups/${groupId}/members`)
+      .get(`/api/groups/${groupId}/members`)
       .then((res) => {
         setStudents(Array.isArray(res.data?.students) ? res.data.students : []);
       })

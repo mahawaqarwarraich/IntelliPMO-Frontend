@@ -34,7 +34,9 @@ import AllSubmissions from './components/all/AllSubmissions';
 import CreatePanelsD1 from './components/admin/CreatePanelsD1';
 import PanelAssignmentD1 from './components/admin/PanelAssignmentD1';
 import PanelsForD1 from './components/all/PanelsForD1';
-import GiveD1Marks from './components/admin/GiveD1Marks';
+import GiveD1MarksAdmin from './components/admin/GiveD1Marks';
+import GiveD1MarksSupervisor from './components/supervisor/GiveD1Marks';
+import GiveD1MarksEvaluator from './components/evaluator/GiveD1Marks';
 import StudentsForD1 from './components/admin/StudentsForD1';
 import AdminD1EvaluationForm from './components/admin/AdminD1EvaluationForm';
 
@@ -76,7 +78,9 @@ function App() {
         <Route path="supervisor/group-requests" element={<SupervisorGroupRequest />} />
         <Route path="my-groups" element={<MyGroup />} />
         <Route path="give-marks" element={<DashboardPlaceholder />} />
-        <Route path="give-d1-marks" element={<GiveD1Marks />} />
+        <Route path="give-d1-marks/admin" element={<GiveD1MarksAdmin />} />
+        <Route path="give-d1-marks/supervisor" element={<GiveD1MarksSupervisor />} />
+        <Route path="give-d1-marks/evaluator" element={<GiveD1MarksEvaluator />} />
         <Route path="give-d1-marks/group/:groupId" element={<StudentsForD1 />} />
         <Route path="give-d1-marks/group/:groupId/student/:studentId" element={<AdminD1EvaluationForm />} />
         <Route path="chat-rooms" element={<ChatRoom />}>
