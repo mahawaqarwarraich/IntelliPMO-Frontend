@@ -1,15 +1,24 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { api } from '../../api/client';
+import { useAuth } from '../../context/AuthContext';
 
 export default function GiveD1Marks() {
   const navigate = useNavigate();
+  const { user } = useAuth();
+  const isAdmin = user?.role === 'Admin';
   const [loading, setLoading] = useState(true);
   const [groups, setGroups] = useState([]);
   const [error, setError] = useState('');
   const [ideaNameFilter, setIdeaNameFilter] = useState('');
 
   useEffect(() => {
+    if (!isAdmin) {
+      setLoading(false);
+      setGroups([]);
+      setError('');
+      return;
+    }
     setLoading(true);
     setError('');
     api
@@ -21,13 +30,24 @@ export default function GiveD1Marks() {
         setError(err.response?.data?.message ?? err.message ?? 'Failed to load groups.');
       })
       .finally(() => setLoading(false));
-  }, []);
+  }, [isAdmin]);
 
   const filteredGroups = useMemo(() => {
     const q = (ideaNameFilter || '').trim().toLowerCase();
     if (!q) return groups;
     return groups.filter((g) => (g.ideaName || '').toLowerCase().includes(q));
   }, [groups, ideaNameFilter]);
+
+  if (!isAdmin) {
+    return (
+      <div className="max-w-4xl mx-auto mt-6">
+        <div className="rounded-xl border border-amber-200 bg-amber-50 shadow-sm p-6 sm:p-8">
+          <h1 className="text-xl font-semibold text-gray-900 mb-2">Give D1 marks</h1>
+          <p className="text-sm text-gray-700">Only admins can access this page.</p>
+        </div>
+      </div>
+    );
+  }
 
   if (loading) {
     return (
