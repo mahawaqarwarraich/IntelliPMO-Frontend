@@ -68,7 +68,7 @@ export const sidebarLinks = {
     { label: 'Groups and Evaluation Panels (defense 1)', path: '/dashboard/groups-defense1', icon: 'users' },
     { label: 'Groups and Evaluation Panels (defense 2)', path: '/dashboard/groups-defense2', icon: 'users' },
     { label: 'All registered groups', path: '/dashboard/all-groups', icon: 'users' },
-    { label: 'Give D1 marks', path: '/dashboard/give-d1-marks/supervisor', icon: 'file' },
+    { label: 'Give D1 marks', path: '/dashboard/supervisor/give-d1-marks/', icon: 'file' },
   ],
   evaluator: [
     { label: 'All domains', path: '/dashboard/all-domains', icon: 'file' },

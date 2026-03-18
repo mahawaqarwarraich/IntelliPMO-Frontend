@@ -78,9 +78,9 @@ function App() {
         <Route path="supervisor/group-requests" element={<SupervisorGroupRequest />} />
         <Route path="my-groups" element={<MyGroup />} />
         <Route path="give-marks" element={<DashboardPlaceholder />} />
-        <Route path="give-d1-marks/admin" element={<GiveD1MarksAdmin />} />
-        <Route path="give-d1-marks/supervisor" element={<GiveD1MarksSupervisor />} />
-        <Route path="give-d1-marks/evaluator" element={<GiveD1MarksEvaluator />} />
+        <Route path="give-d1-marks" element={<GiveD1MarksAdmin />} />
+        <Route path="supervisor/give-d1-marks" element={<GiveD1MarksSupervisor />} />
+        <Route path="evaluator/give-d1-marks" element={<GiveD1MarksEvaluator />} />
         <Route path="give-d1-marks/group/:groupId" element={<StudentsForD1 />} />
         <Route path="give-d1-marks/group/:groupId/student/:studentId" element={<AdminD1EvaluationForm />} />
         <Route path="chat-rooms" element={<ChatRoom />}>

@@ -33,13 +33,6 @@ export default function StudentsForD1() {
   return (
     <div className="max-w-4xl mx-auto mt-6">
       <div className="mb-4">
-        <button
-          type="button"
-          onClick={() => navigate('/dashboard/give-d1-marks')}
-          className="text-sm font-medium text-accent hover:underline mb-2"
-        >
-          ← Back to Give D1 marks
-        </button>
         <h1 className="text-2xl font-semibold text-gray-900 mb-1">Students for D1</h1>
         <p className="text-sm text-gray-500">Students in this group. Click a roll number to manage D1 marks.</p>
       </div>
