@@ -39,6 +39,7 @@ import GiveD1MarksSupervisor from './components/supervisor/GiveD1Marks';
 import GiveD1MarksEvaluator from './components/evaluator/GiveD1Marks';
 import StudentsForD1 from './components/admin/StudentsForD1';
 import AdminD1EvaluationForm from './components/admin/AdminD1EvaluationForm';
+import SupervisorD1EvaluationForm from './components/supervisor/SupervisorD1EvaluationForm';
 
 function App() {
   return (
@@ -83,6 +84,7 @@ function App() {
         <Route path="evaluator/give-d1-marks" element={<GiveD1MarksEvaluator />} />
         <Route path="give-d1-marks/group/:groupId" element={<StudentsForD1 />} />
         <Route path="give-d1-marks/group/:groupId/student/:studentId" element={<AdminD1EvaluationForm />} />
+        <Route path="supervisor/give-d1-marks/group/:groupId/student/:studentId" element={<SupervisorD1EvaluationForm />} />
         <Route path="chat-rooms" element={<ChatRoom />}>
           <Route path=":groupId" element={<Group />} />
         </Route>
