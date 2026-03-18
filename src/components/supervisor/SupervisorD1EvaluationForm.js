@@ -103,7 +103,7 @@ export default function SupervisorD1EvaluationForm() {
       <div className="rounded-xl border border-gray-200 bg-white shadow-sm p-6 sm:p-7">
         <div className="mb-5">
           <h2 className="text-lg font-semibold text-gray-900">Supervisor marks</h2>
-          <p className="text-sm text-gray-500 mt-1">Marks out of 20 (supervisor).</p>
+          <p className="text-sm text-gray-500 mt-1">Marks out of 20 (for meetings and project progress).</p>
         </div>
 
         <div className="max-w-sm">

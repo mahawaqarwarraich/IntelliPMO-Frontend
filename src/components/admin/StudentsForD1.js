@@ -8,6 +8,7 @@ export default function StudentsForD1() {
   const navigate = useNavigate();
   const { user } = useAuth();
   const isAdmin = user?.role === 'Admin';
+  const isSupervisor = user?.role === 'Supervisor';
   const [loading, setLoading] = useState(true);
   const [students, setStudents] = useState([]);
   const [error, setError] = useState('');
@@ -57,7 +58,11 @@ export default function StudentsForD1() {
               <li key={s._id} className="p-4 hover:bg-gray-50/50 flex items-center justify-between">
                 <div>
                   <Link
-                    to={`/dashboard/give-d1-marks/group/${groupId}/student/${s._id}`}
+                    to={
+                      isSupervisor
+                        ? `/dashboard/supervisor/give-d1-marks/group/${groupId}/student/${s._id}`
+                        : `/dashboard/give-d1-marks/group/${groupId}/student/${s._id}`
+                    }
                     state={{ rollNo: s.rollNo, fullName: s.fullName }}
                     className="text-accent font-medium hover:underline"
                   >
