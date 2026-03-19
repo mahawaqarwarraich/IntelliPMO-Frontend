@@ -78,6 +78,14 @@ export default function StudentsForD1() {
                     ✓
                   </span>
                 )}
+                {isSupervisor && s.supervisorD1Marks && (
+                  <span
+                    className="inline-flex items-center text-green-600 text-sm font-medium"
+                    title="Supervisor D1 marks recorded"
+                  >
+                    ✓
+                  </span>
+                )}
               </li>
             ))}
           </ul>
