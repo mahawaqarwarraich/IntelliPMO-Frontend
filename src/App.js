@@ -37,7 +37,7 @@ import PanelsForD1 from './components/all/PanelsForD1';
 import GiveD1MarksAdmin from './components/admin/GiveD1Marks';
 import GiveD1MarksSupervisor from './components/supervisor/GiveD1Marks';
 import GiveD1MarksEvaluator from './components/evaluator/GiveD1Marks';
-import StudentsForD1 from './components/admin/StudentsForD1';
+import StudentsForD1 from './components/all/StudentsForD1';
 import AdminD1EvaluationForm from './components/admin/AdminD1EvaluationForm';
 import SupervisorD1EvaluationForm from './components/supervisor/SupervisorD1EvaluationForm';
 

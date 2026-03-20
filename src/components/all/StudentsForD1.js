@@ -74,7 +74,7 @@ export default function StudentsForD1() {
       ) : !sessionOk ? (
         <div className="rounded-xl border border-amber-200 bg-amber-50 shadow-sm p-6 sm:p-8">
           <h2 className="text-lg font-semibold text-gray-900 mb-1">Students for D1</h2>
-          <p className="text-sm text-gray-700">Your session is not active.</p>
+          <p className="text-sm text-gray-700">Your session is not active for now.</p>
         </div>
       ) : error ? (
         <div className="rounded-md bg-red-50 border border-red-200 py-2 px-3 text-sm text-red-700" role="alert">

@@ -1,10 +1,12 @@
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { api } from '../../api/client';
 
 export default function GiveD1MarksEvaluator() {
   const { user } = useAuth();
   const isEvaluator = user?.role === 'Evaluator';
+  const navigate = useNavigate();
 
   const [loading, setLoading] = useState(true);
   const [sessionOk, setSessionOk] = useState(false);
@@ -29,7 +31,9 @@ export default function GiveD1MarksEvaluator() {
       try {
         const sessionRes = await api.get('/api/sessions/active-id');
         const activeSessionId = sessionRes.data?.activeSessionId ?? null;
+        console.log(activeSessionId);
         const mySessionId = user?.sessionId ?? null;
+        console.log(mySessionId);
 
         if (!activeSessionId || !mySessionId || String(activeSessionId) !== String(mySessionId)) {
           if (!cancelled) setSessionOk(false);
@@ -88,7 +92,7 @@ export default function GiveD1MarksEvaluator() {
       <div className="max-w-4xl mx-auto mt-6">
         <div className="rounded-xl border border-amber-200 bg-amber-50 shadow-sm p-6 sm:p-8">
           <h1 className="text-xl font-semibold text-gray-900 mb-2">Give D1 marks</h1>
-          <p className="text-sm text-gray-700">Your session is not active.</p>
+          <p className="text-sm text-gray-700">Your session is not active for now.</p>
         </div>
       </div>
     );
@@ -123,6 +127,15 @@ export default function GiveD1MarksEvaluator() {
           {groups.map((g) => (
             <div
               key={g._id}
+              role="button"
+              tabIndex={0}
+              onClick={() => navigate(`/dashboard/give-d1-marks/group/${g._id}`)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault();
+                  navigate(`/dashboard/give-d1-marks/group/${g._id}`);
+                }
+              }}
               className="rounded-xl border border-gray-200 bg-white shadow-sm p-4 hover:border-accent hover:bg-gray-50/50 transition-colors"
             >
               <div className="flex flex-wrap gap-x-6 gap-y-3 text-sm">
