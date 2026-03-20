@@ -80,6 +80,6 @@ export const sidebarLinks = {
     { label: 'Groups and Evaluation Panels (defense 2)', path: '/dashboard/groups-defense2', icon: 'users' },
     { label: 'Panels for D1', path: '/dashboard/panels-d1', icon: 'users' },
     { label: 'Assigned Groups', path: '/dashboard/assigned-groups', icon: 'users' },
-    { label: 'Give Marks', path: '/dashboard/give-marks', icon: 'file' },
+    { label: 'Give D1 marks', path: '/dashboard/evaluator/give-d1-marks', icon: 'file' },
   ],
 };
