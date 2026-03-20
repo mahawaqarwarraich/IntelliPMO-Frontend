@@ -60,7 +60,7 @@ export default function SupervisorD1EvaluationForm() {
     setSubmitting(true);
     try {
       await api.patch(`/api/d1-evaluation-form/${studentId}`, {
-        supervisorMarks20: numericMarks,
+        supervisorMarks: numericMarks,
       });
       showToast('Marks saved successfully.', 'success');
     } catch (err) {
@@ -111,7 +111,7 @@ export default function SupervisorD1EvaluationForm() {
             Marks (0–20)
           </label>
           <input
-            id="marks20"p
+            id="marks20"
             type="number"
             min={0}
             max={20}

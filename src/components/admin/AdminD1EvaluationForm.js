@@ -52,7 +52,7 @@ export default function AdminD1EvaluationForm() {
     setSubmitting(true);
     try {
       await api.patch(`/api/d1-evaluation-form/${studentId}`, {
-        adminMarks10: numericMarks,
+        adminMarks: numericMarks,
       });
       showToast('Marks saved successfully.', 'success');
     } catch (err) {
