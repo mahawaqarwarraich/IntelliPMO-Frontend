@@ -190,8 +190,7 @@ export default function EvaluatorD1EvaluationForm() {
 
       <div className="rounded-xl border border-gray-200 bg-white shadow-sm p-6 sm:p-7">
         <div className="mb-5">
-          <h2 className="text-lg font-semibold text-gray-900">D1 rubric marks</h2>
-          <p className="text-sm text-gray-500 mt-1">
+          <p className="text-sm text-gray-500">
             Enter obtained marks for each criterion (0 up to the max shown).
           </p>
         </div>
