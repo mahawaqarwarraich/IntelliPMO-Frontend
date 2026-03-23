@@ -12,7 +12,7 @@ function getInitial(str) {
 function getNavbarCenterPaths(role) {
   const r = (role || 'admin').toLowerCase();
   return [
-    { label: 'FYP Guide', path: r === 'student' ? '/dashboard/fyp-guide' : '/dashboard/session-policy' },
+    { label: 'FYP Guide', path: '/dashboard/fyp-guide'},
     { label: 'FYP Events', path: '/dashboard/fyp-events' },
     { label: 'FYP Resources', path: '/dashboard/fyp-resources' },
   ];

@@ -8,6 +8,7 @@ import EvaluatorLoginForm from './components/Login/EvaluatorLoginForm';
 import DashboardLayout from './components/DashboardLayout';
 import DashboardHome from './components/DashboardHome';
 import DashboardPlaceholder from './components/DashboardPlaceholder';
+import FypGuide from './components/FypGuide';
 import ManageSessions from './components/admin/ManageSessions';
 import ManageDomains from './components/admin/ManageDomains';
 import ManageStudents from './components/admin/ManageStudents';
@@ -93,7 +94,7 @@ function App() {
         
         <Route path="register-group" element={<RegisterGroup />} />
         <Route path="request-status" element={<ProtectedRoute><GroupStatus /></ProtectedRoute>} />
-        <Route path="fyp-guide" element={<DashboardPlaceholder />} />
+        <Route path="fyp-guide" element={<FypGuide />} />
         <Route path="meetings" element={<DashboardPlaceholder />} />
         <Route path="create-meeting" element={<CreateMeeting />} />
         <Route path="all-meetings" element={<AllMeetings />} />
