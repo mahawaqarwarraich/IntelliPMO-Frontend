@@ -1,5 +1,6 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
+import { api } from '../../api/client';
 import { useAuth } from '../../context/AuthContext';
 
 const INITIAL_MARKS = {
@@ -20,6 +21,43 @@ const INITIAL_MARKS = {
   partialWorkingSystem: '',
 };
 
+/** Max marks per rubric field (matches Backend/models/D1EvaluationForm.js). */
+const RUBRIC_MAX_BY_KEY = {
+  understandingOfExistingSystem: 5,
+  wellDefinedGoalsAndObjectives: 5,
+  conceptualArchitecture: 5,
+  presentationSkill: 5,
+  functionalRequirement: 2,
+  interfaces: 2,
+  usecaseDescription: 2,
+  usecaseDiagram: 2,
+  nonFunctionalAttribute: 2,
+  domainModelOrErd: 2,
+  classDiagramOrDataFlowDiagram: 2,
+  sequenceDiagramOrStateTransitionDiagram: 2,
+  stateChartDiagramOrArchitecturalDiagram: 2,
+  collaborationDiagramOrComponentDiagram: 2,
+  partialWorkingSystem: 10,
+};
+
+const RUBRIC_LABEL_BY_KEY = {
+  understandingOfExistingSystem: 'Understanding of existing system',
+  wellDefinedGoalsAndObjectives: 'Well-defined goals and objectives',
+  conceptualArchitecture: 'Conceptual architecture',
+  presentationSkill: 'Presentation skill',
+  functionalRequirement: 'Functional requirement',
+  interfaces: 'Interfaces',
+  usecaseDescription: 'Use case description',
+  usecaseDiagram: 'Use case diagram',
+  nonFunctionalAttribute: 'Non-functional attribute',
+  domainModelOrErd: 'Domain model or ERD',
+  classDiagramOrDataFlowDiagram: 'Class diagram or data flow diagram',
+  sequenceDiagramOrStateTransitionDiagram: 'Sequence diagram or state transition diagram',
+  stateChartDiagramOrArchitecturalDiagram: 'State chart diagram or architectural diagram',
+  collaborationDiagramOrComponentDiagram: 'Collaboration diagram or component diagram',
+  partialWorkingSystem: 'Partial working system',
+};
+
 export default function EvaluatorD1EvaluationForm() {
   const { user } = useAuth();
   const isEvaluator = user?.role === 'Evaluator';
@@ -31,6 +69,74 @@ export default function EvaluatorD1EvaluationForm() {
   const fullName = location.state?.fullName ?? '';
 
   const [marksByKey, setMarksByKey] = useState(INITIAL_MARKS);
+  const [submitting, setSubmitting] = useState(false);
+  const [toast, setToast] = useState({ show: false, message: '', type: 'success' });
+  const toastTimerRef = useRef(null);
+
+  useEffect(() => {
+    return () => {
+      if (toastTimerRef.current) clearTimeout(toastTimerRef.current);
+    };
+  }, []);
+
+  const showToast = useCallback((message, type = 'success') => {
+    if (toastTimerRef.current) clearTimeout(toastTimerRef.current);
+    setToast({ show: true, message, type });
+    toastTimerRef.current = setTimeout(() => {
+      setToast((t) => ({ ...t, show: false }));
+      toastTimerRef.current = null;
+    }, 3000);
+  }, []);
+
+  /** PATCH body: each rubric key -> obtained marks (same shape as supervisor sending supervisorMarks). */
+  const evaluatorPatchResult = useMemo(() => {
+    const body = {};
+    for (const key of Object.keys(RUBRIC_MAX_BY_KEY)) {
+      const raw = marksByKey[key];
+      if (raw === '' || raw == null) {
+        return { error: 'Please enter marks for every criterion before submitting.' };
+      }
+      const n = Number(raw);
+      if (!Number.isFinite(n)) {
+        return { error: `Invalid number for ${RUBRIC_LABEL_BY_KEY[key] || key}.` };
+      }
+      const max = RUBRIC_MAX_BY_KEY[key];
+      if (n < 0 || n > max) {
+        return {
+          error: `${RUBRIC_LABEL_BY_KEY[key] || key} must be between 0 and ${max}.`,
+        };
+      }
+      body[key] = n;
+    }
+    return { body };
+  }, [marksByKey]);
+
+  const handleSubmit = useCallback(async () => {
+    if (!isEvaluator) {
+      showToast('Only evaluators can access this page.', 'error');
+      return;
+    }
+    if (!studentId) {
+      showToast('Student not found.', 'error');
+      return;
+    }
+    if (evaluatorPatchResult.error) {
+      showToast(evaluatorPatchResult.error, 'error');
+      return;
+    }
+
+    setSubmitting(true);
+    try {
+      await api.patch(`/api/d1-evaluation-form/${studentId}`, evaluatorPatchResult.body);
+      setMarksByKey({ ...INITIAL_MARKS });
+      showToast('Marks saved successfully.', 'success');
+    } catch (err) {
+      const msg = err.response?.data?.message || err.message || 'Failed to save marks.';
+      showToast(msg, 'error');
+    } finally {
+      setSubmitting(false);
+    }
+  }, [isEvaluator, studentId, evaluatorPatchResult, showToast]);
 
   /** Text inputs avoid native number spinners / wheel / arrow stepping. Strip non-digits (good for paste). */
   const handleDigitChange = useCallback((key, value) => {
@@ -365,14 +471,26 @@ export default function EvaluatorD1EvaluationForm() {
         <div className="mt-6 flex justify-end">
           <button
             type="button"
-            disabled
-            title="Submit will be wired up later"
-            className="py-2.5 px-6 bg-accent text-white border-0 rounded-md font-semibold text-[15px] cursor-not-allowed transition-colors focus:outline-none focus:ring-[3px] focus:ring-accent/30 opacity-60"
+            onClick={handleSubmit}
+            disabled={submitting}
+            className="py-2.5 px-6 bg-accent text-white border-0 rounded-md font-semibold text-[15px] cursor-pointer transition-colors hover:bg-accent-hover focus:outline-none focus:ring-[3px] focus:ring-accent/30 disabled:opacity-60 disabled:cursor-not-allowed"
           >
-            Submit marks
+            {submitting ? 'Saving…' : 'Submit marks'}
           </button>
         </div>
       </div>
+
+      {toast.show && (
+        <div
+          className={`fixed bottom-6 left-1/2 -translate-x-1/2 px-4 py-2 rounded-lg text-white text-sm font-medium z-50 ${
+            toast.type === 'success' ? 'bg-green-600' : 'bg-red-600'
+          }`}
+          style={{ animation: 'toast-fade-in 0.25s ease-out' }}
+          role="alert"
+        >
+          <span>{toast.message}</span>
+        </div>
+      )}
     </div>
   );
 }
