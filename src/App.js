@@ -10,6 +10,7 @@ import DashboardHome from './components/DashboardHome';
 import DashboardPlaceholder from './components/DashboardPlaceholder';
 import FypGuide from './components/FypGuide';
 import FypResources from './components/FypResources';
+import FypEvents from './components/FypEvents';
 import ManageSessions from './components/admin/ManageSessions';
 import ManageDomains from './components/admin/ManageDomains';
 import ManageStudents from './components/admin/ManageStudents';
@@ -75,7 +76,7 @@ function App() {
         <Route path="domains-supervisors" element={<DomainsSupervisors />} />
         <Route path="session-policy" element={<SessionPolicy />} />
         <Route path="fyp-resources" element={<FypResources />} />
-        <Route path="fyp-events" element={<DashboardPlaceholder />} />
+        <Route path="fyp-events" element={<FypEvents />} />
         <Route path="previous-fyps" element={<DashboardPlaceholder />} />
         <Route path="supervisor-allocation" element={<ProtectedRoute><SupervisorAllocation /></ProtectedRoute>} />
         <Route path="admin/group-requests" element={<AdminGroupRequest />} />
