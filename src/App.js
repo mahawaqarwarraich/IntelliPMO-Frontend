@@ -44,6 +44,7 @@ import StudentsForD1 from './components/all/StudentsForD1';
 import AdminD1EvaluationForm from './components/admin/AdminD1EvaluationForm';
 import SupervisorD1EvaluationForm from './components/supervisor/SupervisorD1EvaluationForm';
 import EvaluatorD1EvaluationForm from './components/evaluator/EvaluatorD1EvaluationForm';
+import FIA from './components/FIA';
 
 function App() {
   return (
@@ -97,6 +98,7 @@ function App() {
         <Route path="register-group" element={<RegisterGroup />} />
         <Route path="request-status" element={<ProtectedRoute><GroupStatus /></ProtectedRoute>} />
         <Route path="fyp-guide" element={<FypGuide />} />
+        <Route path="fia" element={<FIA />} />
         <Route path="meetings" element={<DashboardPlaceholder />} />
         <Route path="create-meeting" element={<CreateMeeting />} />
         <Route path="all-meetings" element={<AllMeetings />} />

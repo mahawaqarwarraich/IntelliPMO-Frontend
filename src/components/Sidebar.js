@@ -37,6 +37,14 @@ const ICONS = {
       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
     </svg>
   ),
+  ai: (
+    // "Sparkles/AI" themed icon to better match the assistant.
+    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 2l1.2 4.1L17.3 7.3 13.2 8.5 12 12.6 10.8 8.5 6.7 7.3l4.1-1.2L12 2z" />
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 10l.8 2.7L22.5 13.5l-2.7.8L19 17l-.8-2.7-2.7-.8 2.7-.8L19 10z" />
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.5 11l.7 2.3 2.3.7-2.3.7-.7 2.3-.7-2.3-2.3-.7 2.3-.7.7-2.3z" />
+    </svg>
+  ),
 };
 
 function NavIcon({ iconKey }) {
