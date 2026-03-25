@@ -6,7 +6,6 @@ const FIELD_NAMES = [
   'email',
   'password',
   'confirmPassword',
-  'session',
   'designation',
 ];
 
@@ -41,8 +40,6 @@ function validateField(field, values, touchedState) {
       return val.length < MIN_PASSWORD_LENGTH ? `Password must be at least ${MIN_PASSWORD_LENGTH} characters.` : null;
     case 'confirmPassword':
       return values.password !== values.confirmPassword ? 'Passwords do not match.' : null;
-    case 'session':
-      return null; // value is session id from dropdown
     case 'designation':
       if (val.length < 2) return 'Enter at least 2 characters.';
       return null;
@@ -53,8 +50,6 @@ function validateField(field, values, touchedState) {
 
 const inputClass =
   'w-full min-w-0 py-2.5 px-3 border border-gray-200 rounded-md bg-white text-gray-900 placeholder-gray-500 transition-colors focus:outline-none focus:border-accent focus:ring-[3px] focus:ring-accent/20 disabled:bg-gray-50 disabled:cursor-not-allowed';
-const selectClass =
-  'w-full py-2.5 px-3 border border-gray-200 rounded-md bg-white text-gray-900 transition-colors focus:outline-none focus:border-accent focus:ring-[3px] focus:ring-accent/20 disabled:bg-gray-50 disabled:cursor-not-allowed';
 const labelClass = 'text-[13px] font-medium text-gray-900';
 const errorClass = 'text-xs text-red-600 mt-0.5';
 const fieldWrapClass = 'flex flex-col gap-1.5 min-w-0';
@@ -65,26 +60,8 @@ export default function AdminRegisterForm({ onBack, onSubmit, onLogin }) {
   const [submitError, setSubmitError] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [toast, setToast] = useState({ show: false, message: '', type: 'success' });
-  const [activeSessions, setActiveSessions] = useState([]);
-  const [sessionsLoading, setSessionsLoading] = useState(true);
   const toastTimerRef = useRef(null);
   const firstErrorIdRef = useRef(null);
-
-  useEffect(() => {
-    let cancelled = false;
-    api
-      .get('/api/sessions', { params: { status: 'active' } })
-      .then((res) => {
-        if (!cancelled && Array.isArray(res.data?.sessions)) setActiveSessions(res.data.sessions);
-      })
-      .catch(() => {
-        if (!cancelled) setActiveSessions([]);
-      })
-      .finally(() => {
-        if (!cancelled) setSessionsLoading(false);
-      });
-    return () => { cancelled = true; };
-  }, []);
 
   const showToast = useCallback((message, type = 'success') => {
     if (toastTimerRef.current) clearTimeout(toastTimerRef.current);
@@ -128,8 +105,6 @@ export default function AdminRegisterForm({ onBack, onSubmit, onLogin }) {
 
     const payload = { ...values };
     delete payload.confirmPassword;
-    payload.session_id = payload.session;
-    delete payload.session;
 
     setSubmitting(true);
     try {
@@ -154,7 +129,6 @@ export default function AdminRegisterForm({ onBack, onSubmit, onLogin }) {
   const emailError = getError({ name: 'email' }, touched);
   const passwordError = getError({ name: 'password' }, touched);
   const confirmPasswordError = getError({ name: 'confirmPassword' }, touched);
-  const sessionError = getError({ name: 'session' }, touched);
   const designationError = getError({ name: 'designation' }, touched);
 
   return (
@@ -303,36 +277,6 @@ export default function AdminRegisterForm({ onBack, onSubmit, onLogin }) {
             {confirmPasswordError && (
               <span id="confirmPassword-error" className={errorClass} role="alert">
                 {confirmPasswordError}
-              </span>
-            )}
-          </div>
-
-          <div className={fieldWrapClass}>
-            <label htmlFor="session" className={labelClass}>
-              Session<span className="text-red-500 ml-0.5">*</span>
-            </label>
-            <select
-              id="session"
-              name="session"
-              value={values.session ?? ''}
-              onChange={handleChange('session')}
-              onBlur={handleBlur('session')}
-              required
-              disabled={sessionsLoading}
-              aria-invalid={!!sessionError}
-              aria-describedby={sessionError ? 'session-error' : undefined}
-              className={selectClass}
-            >
-              <option value="">{sessionsLoading ? 'Loading…' : 'Select session'}</option>
-              {activeSessions.map((s) => (
-                <option key={s._id} value={s._id}>
-                  {s.year}
-                </option>
-              ))}
-            </select>
-            {sessionError && (
-              <span id="session-error" className={errorClass} role="alert">
-                {sessionError}
               </span>
             )}
           </div>
