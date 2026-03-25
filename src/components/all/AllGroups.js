@@ -117,6 +117,14 @@ export default function AllGroups() {
                   <span className="font-medium text-gray-500">Supervisor name</span>
                   <p className="text-gray-900 mt-0.5">{g.supervisorName ?? '—'}</p>
                 </div>
+                <div>
+                  <span className="font-medium text-gray-500">Members</span>
+                  <p className="text-gray-900 mt-0.5">
+                    {Array.isArray(g.memberNames) && g.memberNames.length > 0
+                      ? g.memberNames.join(', ')
+                      : '—'}
+                  </p>
+                </div>
               </div>
               <div className="mt-3 text-sm">
                 <span className="font-medium text-gray-500">Description</span>
