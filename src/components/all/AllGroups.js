@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { api } from '../../api/client';
 
@@ -7,6 +7,7 @@ export default function AllGroups() {
   const [loading, setLoading] = useState(true);
   const [sessionOk, setSessionOk] = useState(false);
   const [groups, setGroups] = useState([]);
+  const [ideaNameFilter, setIdeaNameFilter] = useState('');
   const [error, setError] = useState('');
 
   const isAdmin = user?.role === 'Admin';
@@ -56,6 +57,12 @@ export default function AllGroups() {
       .finally(() => setLoading(false));
   }, [user?.token, user?.role, user?.sessionId, isAdmin]);
 
+  const filteredGroups = useMemo(() => {
+    const q = (ideaNameFilter || '').trim().toLowerCase();
+    if (!q) return groups;
+    return groups.filter((g) => (g.ideaName || '').toLowerCase().includes(q));
+  }, [groups, ideaNameFilter]);
+
   if (loading) {
     return (
       <div className="max-w-4xl mx-auto">
@@ -103,35 +110,52 @@ export default function AllGroups() {
         </div>
       ) : (
         <div className="space-y-4">
-          {groups.map((g) => (
-            <div
-              key={g._id}
-              className="rounded-xl border border-gray-200 bg-white shadow-sm p-4"
-            >
-              <div className="flex flex-wrap gap-x-6 gap-y-3 text-sm">
-                <div>
-                  <span className="font-medium text-gray-500">Idea name</span>
-                  <p className="text-gray-900 mt-0.5">{g.ideaName ?? '—'}</p>
-                </div>
-                <div>
-                  <span className="font-medium text-gray-500">Supervisor name</span>
-                  <p className="text-gray-900 mt-0.5">{g.supervisorName ?? '—'}</p>
-                </div>
-                <div>
-                  <span className="font-medium text-gray-500">Members</span>
-                  <p className="text-gray-900 mt-0.5">
-                    {Array.isArray(g.memberNames) && g.memberNames.length > 0
-                      ? g.memberNames.join(', ')
-                      : '—'}
-                  </p>
-                </div>
-              </div>
-              <div className="mt-3 text-sm">
-                <span className="font-medium text-gray-500">Description</span>
-                <p className="text-gray-700 mt-0.5">{g.ideaDescription ?? '—'}</p>
-              </div>
+          <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-3">
+            <div>
+              <span className="block text-sm font-medium text-gray-700 mb-1">Filter by idea name</span>
+              <input
+                type="text"
+                value={ideaNameFilter}
+                onChange={(e) => setIdeaNameFilter(e.target.value)}
+                placeholder="Search…"
+                className="w-full sm:w-72 py-2 px-3 border border-gray-200 rounded-md bg-white text-gray-900 placeholder-gray-500 focus:outline-none focus:border-accent focus:ring-[3px] focus:ring-accent/20"
+              />
             </div>
-          ))}
+            <div className="text-sm text-gray-500">
+              Showing {filteredGroups.length} of {groups.length}
+            </div>
+          </div>
+
+          {filteredGroups.length === 0 ? (
+            <div className="rounded-xl border border-gray-200 bg-white shadow-sm p-8 text-center text-gray-500">
+              No registered groups match “{ideaNameFilter.trim()}”.
+            </div>
+          ) : (
+            filteredGroups.map((g) => (
+              <div key={g._id} className="rounded-xl border border-gray-200 bg-white shadow-sm p-4">
+                <div className="flex flex-wrap gap-x-6 gap-y-3 text-sm">
+                  <div>
+                    <span className="font-medium text-gray-500">Idea name</span>
+                    <p className="text-gray-900 mt-0.5">{g.ideaName ?? '—'}</p>
+                  </div>
+                  <div>
+                    <span className="font-medium text-gray-500">Supervisor name</span>
+                    <p className="text-gray-900 mt-0.5">{g.supervisorName ?? '—'}</p>
+                  </div>
+                  <div>
+                    <span className="font-medium text-gray-500">Members</span>
+                    <p className="text-gray-900 mt-0.5">
+                      {Array.isArray(g.memberNames) && g.memberNames.length > 0 ? g.memberNames.join(', ') : '—'}
+                    </p>
+                  </div>
+                </div>
+                <div className="mt-3 text-sm">
+                  <span className="font-medium text-gray-500">Description</span>
+                  <p className="text-gray-700 mt-0.5">{g.ideaDescription ?? '—'}</p>
+                </div>
+              </div>
+            ))
+          )}
         </div>
       )}
     </div>

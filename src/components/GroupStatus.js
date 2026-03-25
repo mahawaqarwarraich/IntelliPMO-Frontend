@@ -8,6 +8,7 @@ export default function GroupStatus() {
   const [sessionActive, setSessionActive] = useState(false);
   const [group, setGroup] = useState(null);
   const [error, setError] = useState('');
+  const [deleting, setDeleting] = useState(false);
 
   useEffect(() => {
     setLoading(true);
@@ -88,8 +89,28 @@ export default function GroupStatus() {
     );
   }
 
+  const isStudent = user?.role === 'Student';
+  const isRejected = group.adminStatus === 'rejected' || group.supervisorStatus === 'rejected';
+
   const approvalLabel = (status) =>
     status === 'accepted' ? 'Accepted' : status === 'rejected' ? 'Rejected' : 'Pending';
+
+  const handleDeleteGroup = async () => {
+    if (!isStudent || !user?.id || !user?.token || !group) return;
+    const confirmed = window.confirm('Are you sure you want to delete your group?');
+    if (!confirmed) return;
+
+    try {
+      setDeleting(true);
+      setError('');
+      await api.delete(`/api/groups/${user.id}`);
+      setGroup(null);
+    } catch (err) {
+      setError(err.response?.data?.message || err.message || 'Failed to delete group.');
+    } finally {
+      setDeleting(false);
+    }
+  };
 
   return (
     <div className="max-w-4xl mx-auto">
@@ -118,6 +139,19 @@ export default function GroupStatus() {
           </tbody>
         </table>
       </div>
+
+      {isRejected && isStudent && (
+        <div className="mt-5 flex flex-col sm:flex-row gap-3 items-start sm:items-center">
+          <button
+            type="button"
+            onClick={handleDeleteGroup}
+            disabled={deleting}
+            className="px-5 py-2.5 rounded-lg font-medium bg-red-600 text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+          >
+            {deleting ? 'Deleting…' : 'Delete group'}
+          </button>
+        </div>
+      )}
     </div>
   );
 }
