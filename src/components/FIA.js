@@ -1,6 +1,9 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
+import { api } from '../api/client';
+import { useAuth } from '../context/AuthContext';
 
 export default function FIA() {
+  const { user } = useAuth();
   const [messages, setMessages] = useState([
     {
       id: 1,
@@ -27,29 +30,44 @@ export default function FIA() {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
-  const sendDummy = () => {
+  const sendToFIA = async () => {
     const t = input.trim();
     if (!t || sending) return;
 
     setSending(true);
     const userMsg = { id: messages.length + 1, from: 'You', text: t, createdAt: new Date().toISOString() };
+    setMessages((prev) => [...prev, userMsg]);
+    setInput('');
 
-    // Simulate response delay so it feels like a real assistant.
-    setTimeout(() => {
+    try {
+      const res = await api.post('/api/fia/chat', {
+        message: t,
+        role: user?.role || '',
+      });
+      const replyText = res.data?.reply || 'Dummy FIA reply.';
       setMessages((prev) => [
         ...prev,
-        userMsg,
         {
           id: prev.length + 1,
           from: 'FIA',
-          text:
-            'Dummy response (for now). Next step: connect this UI to the real FIA/AI backend and generate context-aware answers.',
+          text: replyText,
           createdAt: new Date().toISOString(),
         },
       ]);
-      setInput('');
+    } catch (err) {
+      const msg = err.response?.data?.message || err.message || 'Failed to contact FIA.';
+      setMessages((prev) => [
+        ...prev,
+        {
+          id: prev.length + 1,
+          from: 'FIA',
+          text: `Error: ${msg}`,
+          createdAt: new Date().toISOString(),
+        },
+      ]);
+    } finally {
       setSending(false);
-    }, 450);
+    }
   };
 
   return (
@@ -113,14 +131,14 @@ export default function FIA() {
               onKeyDown={(e) => {
                 if (e.key === 'Enter' && !e.shiftKey) {
                   e.preventDefault();
-                  sendDummy();
+                  sendToFIA();
                 }
               }}
             />
           </div>
           <button
             type="button"
-            onClick={sendDummy}
+            onClick={sendToFIA}
             disabled={!input.trim() || sending}
             className="flex-shrink-0 w-9 h-9 rounded-full bg-accent text-white flex items-center justify-center hover:bg-accent-hover focus:outline-none focus:ring-2 focus:ring-accent/30 disabled:opacity-60 disabled:cursor-not-allowed"
             aria-label="Send"
