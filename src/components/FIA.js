@@ -1,30 +1,19 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { api } from '../api/client';
-import { useAuth } from '../context/AuthContext';
 
 export default function FIA() {
-  const { user } = useAuth();
   const [messages, setMessages] = useState([
     {
       id: 1,
       from: 'FIA',
       text:
-        'Hi! I am FIA, your dummy FYP assistant. Ask for help with choosing a topic, planning milestones, or improving your report structure.',
+        'Hi! I am FIA, your FYP assistant. Ask for help with choosing a topic, planning milestones, or improving your report structure.',
       createdAt: new Date().toISOString(),
     },
   ]);
   const [input, setInput] = useState('');
   const [sending, setSending] = useState(false);
   const bottomRef = useRef(null);
-
-  const suggestions = useMemo(
-    () => [
-      'Suggest research questions and objectives',
-      'How do I structure a literature review?',
-      'How do I use the FYP management platform for my next steps?',
-    ],
-    []
-  );
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -42,9 +31,8 @@ export default function FIA() {
     try {
       const res = await api.post('/api/fia/chat', {
         message: t,
-        role: user?.role || '',
       });
-      const replyText = res.data?.reply || 'Dummy FIA reply.';
+      const replyText = res.data?.reply || 'No response from FIA.';
       setMessages((prev) => [
         ...prev,
         {
@@ -79,24 +67,9 @@ export default function FIA() {
           </div>
           <div className="min-w-0 flex-1">
             <h2 className="text-sm sm:text-base font-semibold text-gray-900 truncate">FIA - FYP Intelligent Assistant</h2>
-            <p className="text-xs text-gray-500 truncate">Ask for guidance across planning, writing, and milestones.</p>
+            <p className="text-xs text-gray-500 truncate">I can answer common questions and help you understand how FMS works.</p>
           </div>
         </header>
-
-        <div className="flex-shrink-0 px-3 sm:px-4 py-2 border-b border-gray-200 bg-white">
-          <div className="flex flex-wrap gap-2">
-            {suggestions.map((s) => (
-              <button
-                key={s}
-                type="button"
-                onClick={() => setInput(s)}
-                className="px-3 py-1.5 rounded-full text-xs font-medium bg-gray-100 text-gray-700 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-accent/20"
-              >
-                {s}
-              </button>
-            ))}
-          </div>
-        </div>
 
         <div className="flex-1 min-h-0 overflow-y-auto px-3 sm:px-4 py-3 bg-gray-50">
           <div className="space-y-3">
