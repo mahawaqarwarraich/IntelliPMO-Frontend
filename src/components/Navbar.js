@@ -30,6 +30,8 @@ const closeIcon = (
   </svg>
 );
 
+const LOGO_PATH = `${process.env.PUBLIC_URL || ''}/intelliPMO-logo.svg`;
+
 export default function Navbar({ isSidebarOpen, onToggleSidebar }) {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
@@ -71,12 +73,15 @@ export default function Navbar({ isSidebarOpen, onToggleSidebar }) {
         </button>
         <NavLink
           to="/dashboard"
-          className="flex flex-col min-w-0 hover:opacity-80 hover:no-underline transition-opacity focus:outline-none focus:ring-0 rounded px-1 -mx-1 no-underline"
+          aria-label="IntelliPMO — go to dashboard"
+          className="flex items-center min-w-0 shrink hover:opacity-90 hover:no-underline transition-opacity focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/30 focus-visible:ring-offset-2 rounded px-1 -mx-1 no-underline"
         >
-          <span className="text-base sm:text-lg font-bold text-primary-dark tracking-wide truncate">
-            UOG | FMS
-          </span>
-          <span className="text-[10px] sm:text-xs text-gray-500 truncate">FYP Management System</span>
+          <img
+            src={LOGO_PATH}
+            alt="IntelliPMO"
+            className="h-8 w-auto max-h-8 sm:h-10 sm:max-h-10 max-w-[min(48vw,11rem)] sm:max-w-[min(42vw,14rem)] md:max-w-none object-contain object-left"
+            decoding="async"
+          />
         </NavLink>
       </div>
 
