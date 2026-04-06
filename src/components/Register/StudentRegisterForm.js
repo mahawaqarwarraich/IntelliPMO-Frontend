@@ -1,20 +1,15 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
-import StudentLoginForm from '../Login/StudentLoginForm';
 import { api } from '../../api/client.js';
 
 const FIELD_NAMES = [
   'fullName',
   'rollNo',
-  'cgpa',
   'email',
-  'password',
-  'confirmPassword',
   'session',
 ];
 
 const INITIAL_VALUES = Object.fromEntries(FIELD_NAMES.map((name) => [name, '']));
 
-const MIN_PASSWORD_LENGTH = 6;
 const MIN_FULLNAME_LENGTH = 2;
 const MAX_FULLNAME_LENGTH = 100;
 const STUDENT_EMAIL_REGEX = /^\d{8}-\d{3}@uog\.edu\.pk$/i;
@@ -41,21 +36,11 @@ function validateField(field, values, touchedState) {
         return 'Email must be like 21011519-085@uog.edu.pk (8 digits, hyphen, 3 digits).';
       }
       return null;
-    case 'password':
-      return val.length < MIN_PASSWORD_LENGTH ? `Password must be at least ${MIN_PASSWORD_LENGTH} characters.` : null;
-    case 'confirmPassword':
-      return values.password !== values.confirmPassword ? 'Passwords do not match.' : null;
     case 'rollNo':
       if (!ROLL_NO_REGEX.test(val)) return 'Roll number must be like 21011519-085 (8 digits, hyphen, 3 digits).';
       return null;
     case 'session':
       return null; // value is session id from dropdown
-    case 'cgpa': {
-      const num = parseFloat(val);
-      if (Number.isNaN(num)) return 'Enter a valid number (0 to 4).';
-      if (num < 0 || num > 4) return 'CGPA must be between 0 and 4.';
-      return null;
-    }
     default:
       return null;
   }
@@ -137,7 +122,6 @@ export default function StudentRegisterForm({ onBack, onSubmit, onLogin }) {
     }
 
     const payload = { ...values };
-    delete payload.confirmPassword;
     payload.session_id = payload.session;
     delete payload.session;
 
@@ -162,10 +146,7 @@ export default function StudentRegisterForm({ onBack, onSubmit, onLogin }) {
 
   const fullNameError = getError({ name: 'fullName' }, touched);
   const rollNoError = getError({ name: 'rollNo' }, touched);
-  const cgpaError = getError({ name: 'cgpa' }, touched);
   const emailError = getError({ name: 'email' }, touched);
-  const passwordError = getError({ name: 'password' }, touched);
-  const confirmPasswordError = getError({ name: 'confirmPassword' }, touched);
   const sessionError = getError({ name: 'session' }, touched);
 
   return (
@@ -196,16 +177,6 @@ export default function StudentRegisterForm({ onBack, onSubmit, onLogin }) {
         onSubmit={handleSubmit}
         noValidate
       >
-        {onBack && (
-          <button
-            type="button"
-            className="inline-flex items-center gap-1.5 bg-transparent border-0 text-gray-500 text-sm cursor-pointer p-0 mb-1 hover:text-primary focus:outline-none focus:ring-2 focus:ring-accent/30 rounded"
-            onClick={onBack}
-            aria-label="Back"
-          >
-            ← Back
-          </button>
-        )}
         <h2 className="text-base sm:text-lg font-semibold text-gray-900 m-0 mb-1">
           Register as Student
         </h2>
@@ -269,33 +240,6 @@ export default function StudentRegisterForm({ onBack, onSubmit, onLogin }) {
           </div>
 
           <div className={fieldWrapClass}>
-            <label htmlFor="cgpa" className={labelClass}>
-              CGPA<span className="text-red-500 ml-0.5">*</span>
-            </label>
-            <input
-              id="cgpa"
-              name="cgpa"
-              type="number"
-              placeholder="e.g. 3.2"
-              value={values.cgpa ?? ''}
-              onChange={handleChange('cgpa')}
-              onBlur={handleBlur('cgpa')}
-              required
-              min={0}
-              max={4}
-              step={0.1}
-              aria-invalid={!!cgpaError}
-              aria-describedby={cgpaError ? 'cgpa-error' : undefined}
-              className={inputClass}
-            />
-            {cgpaError && (
-              <span id="cgpa-error" className={errorClass} role="alert">
-                {cgpaError}
-              </span>
-            )}
-          </div>
-
-          <div className={fieldWrapClass}>
             <label htmlFor="email" className={labelClass}>
               University email<span className="text-red-500 ml-0.5">*</span>
             </label>
@@ -315,56 +259,6 @@ export default function StudentRegisterForm({ onBack, onSubmit, onLogin }) {
             {emailError && (
               <span id="email-error" className={errorClass} role="alert">
                 {emailError}
-              </span>
-            )}
-          </div>
-
-          <div className={fieldWrapClass}>
-            <label htmlFor="password" className={labelClass}>
-              Password<span className="text-red-500 ml-0.5">*</span>
-            </label>
-            <input
-              id="password"
-              name="password"
-              type="password"
-              placeholder="Min 6 characters"
-              value={values.password ?? ''}
-              onChange={handleChange('password')}
-              onBlur={handleBlur('password')}
-              required
-              autoComplete="new-password"
-              aria-invalid={!!passwordError}
-              aria-describedby={passwordError ? 'password-error' : undefined}
-              className={inputClass}
-            />
-            {passwordError && (
-              <span id="password-error" className={errorClass} role="alert">
-                {passwordError}
-              </span>
-            )}
-          </div>
-
-          <div className={fieldWrapClass}>
-            <label htmlFor="confirmPassword" className={labelClass}>
-              Confirm password<span className="text-red-500 ml-0.5">*</span>
-            </label>
-            <input
-              id="confirmPassword"
-              name="confirmPassword"
-              type="password"
-              placeholder="••••••••"
-              value={values.confirmPassword ?? ''}
-              onChange={handleChange('confirmPassword')}
-              onBlur={handleBlur('confirmPassword')}
-              required
-              autoComplete="new-password"
-              aria-invalid={!!confirmPasswordError}
-              aria-describedby={confirmPasswordError ? 'confirmPassword-error' : undefined}
-              className={inputClass}
-            />
-            {confirmPasswordError && (
-              <span id="confirmPassword-error" className={errorClass} role="alert">
-                {confirmPasswordError}
               </span>
             )}
           </div>

@@ -188,16 +188,6 @@ export default function EvaluatorRegisterForm({ onBack, onSubmit, onLogin }) {
         onSubmit={handleSubmit}
         noValidate
       >
-        {onBack && (
-          <button
-            type="button"
-            className="inline-flex items-center gap-1.5 bg-transparent border-0 text-gray-500 text-sm cursor-pointer p-0 mb-1 hover:text-primary focus:outline-none focus:ring-2 focus:ring-accent/30 rounded"
-            onClick={onBack}
-            aria-label="Back"
-          >
-            ← Back
-          </button>
-        )}
         <h2 className="text-base sm:text-lg font-semibold text-gray-900 m-0 mb-1">
           Register as Evaluator
         </h2>
