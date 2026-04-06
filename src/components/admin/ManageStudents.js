@@ -144,13 +144,14 @@ export default function ManageStudents() {
                 <th className="text-left py-3 px-4 text-sm font-semibold text-gray-700">Student name</th>
                 <th className="text-left py-3 px-4 text-sm font-semibold text-gray-700">Roll number</th>
                 <th className="text-left py-3 px-4 text-sm font-semibold text-gray-700">Email</th>
+                <th className="text-left py-3 px-4 text-sm font-semibold text-gray-700 w-28">Status</th>
                 <th className="text-right py-3 px-4 text-sm font-semibold text-gray-700 w-24">Action</th>
               </tr>
             </thead>
             <tbody>
               {students.length === 0 ? (
                 <tr>
-                  <td colSpan={5} className="py-8 px-4 text-center text-gray-500 text-sm">
+                  <td colSpan={6} className="py-8 px-4 text-center text-gray-500 text-sm">
                     No students found for the active session.
                   </td>
                 </tr>
@@ -161,6 +162,17 @@ export default function ManageStudents() {
                     <td className="py-3 px-4 text-sm font-medium text-gray-900">{student.studentName}</td>
                     <td className="py-3 px-4 text-sm text-gray-900">{student.rollNo}</td>
                     <td className="py-3 px-4 text-sm text-gray-600">{student.email}</td>
+                    <td className="py-3 px-4">
+                      <span
+                        className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold border ${
+                          (student.status || 'pending') === 'active'
+                            ? 'bg-green-50 text-green-700 border-green-200'
+                            : 'bg-amber-50 text-amber-700 border-amber-200'
+                        }`}
+                      >
+                        {student.status || 'pending'}
+                      </span>
+                    </td>
                     <td className="py-3 px-4 text-right">
                       <button
                         type="button"
