@@ -4,9 +4,9 @@
  */
 export const sidebarLinks = {
   admin: [
-    { label: 'Create Evaluator Account', path: '/dashboard/manage-evaluators', icon: 'users' },
-    { label: 'Create Student Account', path: '/dashboard/manage-students', icon: 'users' },
-    { label: 'Create Supervisor Account', path: '/dashboard/manage-supervisors', icon: 'users' },
+    { label: 'Create Evaluator Account', path: '/dashboard/admin/create-evaluator-account', icon: 'users' },
+    { label: 'Create Student Account', path: '/dashboard/admin/create-student-account', icon: 'users' },
+    { label: 'Create Supervisor Account', path: '/dashboard/admin/create-supervisor-account', icon: 'users' },
     { label: 'Manage FYP sessions', path: '/dashboard/manage-sessions', icon: 'calendar' },
     { label: 'Manage domains', path: '/dashboard/manage-domains', icon: 'file' },
     { label: 'Manage Supervisors', path: '/dashboard/manage-supervisors', icon: 'users' },

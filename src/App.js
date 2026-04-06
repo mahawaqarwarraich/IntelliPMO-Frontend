@@ -16,6 +16,9 @@ import ManageDomains from './components/admin/ManageDomains';
 import ManageStudents from './components/admin/ManageStudents';
 import ManageSupervisors from './components/admin/ManageSupervisors';
 import ManageEvaluators from './components/admin/ManageEvaluators';
+import CreateStudentAccount from './components/admin/CreateStudentAccount';
+import CreateSupervisorAccount from './components/admin/CreateSupervisorAccount';
+import CreateEvaluatorAccount from './components/admin/CreateEvaluatorAccount';
 import SessionPolicy from './components/all/SessionPolicy';
 import AllDomains from './components/all/AllDomains';
 import DomainsSupervisors from './components/all/DomainsSupervisors';
@@ -57,6 +60,9 @@ function App() {
 
       <Route path="/dashboard" element={<DashboardLayout />}>
         <Route index element={<DashboardHome />} />
+        <Route path="admin/create-student-account" element={<CreateStudentAccount />} />
+        <Route path="admin/create-supervisor-account" element={<CreateSupervisorAccount />} />
+        <Route path="admin/create-evaluator-account" element={<CreateEvaluatorAccount />} />
         <Route path="manage-sessions" element={<ManageSessions />} />
         <Route path="manage-events" element={<DashboardPlaceholder />} />
         <Route path="manage-students" element={<ManageStudents />} />
