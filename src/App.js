@@ -34,6 +34,7 @@ import CreateDeadline from './components/admin/CreateDeadline';
 import AllDeadlines from './components/all/AllDeadlines';
 import AllSubmissions from './components/all/AllSubmissions';
 import CreatePanelsD1 from './components/admin/CreatePanelsD1';
+import CreatePanelsD2 from './components/admin/CreatePanelsD2';
 import PanelAssignmentD1 from './components/admin/PanelAssignmentD1';
 import PanelsForD1 from './components/all/PanelsForD1';
 import GiveD1MarksAdmin from './components/admin/GiveD1Marks';
@@ -65,6 +66,7 @@ function App() {
         <Route path="manage-domains" element={<ManageDomains />} />
         <Route path="evaluator-panels" element={<DashboardPlaceholder />} />
         <Route path="create-panels-d1" element={<CreatePanelsD1 />} />
+        <Route path="create-panels-d2" element={<CreatePanelsD2 />} />
         <Route path="panel-assignment-d1" element={<PanelAssignmentD1 />} />
         <Route path="panels-d1" element={<PanelsForD1 />} />
         <Route path="all-sessions" element={<DashboardPlaceholder />} />
