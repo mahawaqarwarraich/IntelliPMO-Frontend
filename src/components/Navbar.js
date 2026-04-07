@@ -30,7 +30,7 @@ const closeIcon = (
   </svg>
 );
 
-const LOGO_PATH = `${process.env.PUBLIC_URL || ''}/intelliPMO-v5-spacing-2.svg`;
+const LOGO_PATH = `${process.env.PUBLIC_URL || ''}/intelliPMO-logo.svg`;
 
 export default function Navbar({ isSidebarOpen, onToggleSidebar }) {
   const { user, logout } = useAuth();

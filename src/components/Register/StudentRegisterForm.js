@@ -12,7 +12,6 @@ const INITIAL_VALUES = Object.fromEntries(FIELD_NAMES.map((name) => [name, '']))
 
 const MIN_FULLNAME_LENGTH = 2;
 const MAX_FULLNAME_LENGTH = 100;
-const STUDENT_EMAIL_REGEX = /^\d{8}-\d{3}@uog\.edu\.pk$/i;
 const ROLL_NO_REGEX = /^\d{8}-\d{3}$/;
 const FULLNAME_REGEX = /^[\p{L}\s\-'.]+$/u;
 
@@ -32,9 +31,6 @@ function validateField(field, values, touchedState) {
       if (!FULLNAME_REGEX.test(val)) return 'Use only letters, spaces, hyphens.';
       return null;
     case 'email':
-      if (!STUDENT_EMAIL_REGEX.test(val)) {
-        return 'Email must be like 21011519-085@uog.edu.pk (8 digits, hyphen, 3 digits).';
-      }
       return null;
     case 'rollNo':
       if (!ROLL_NO_REGEX.test(val)) return 'Roll number must be like 21011519-085 (8 digits, hyphen, 3 digits).';

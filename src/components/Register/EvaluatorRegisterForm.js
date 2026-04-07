@@ -4,8 +4,6 @@ import { api } from '../../api/client.js';
 const FIELD_NAMES = [
   'fullName',
   'email',
-  'password',
-  'confirmPassword',
   'session',
   'defenseType',
   'designation',
@@ -13,7 +11,6 @@ const FIELD_NAMES = [
 
 const INITIAL_VALUES = Object.fromEntries(FIELD_NAMES.map((name) => [name, '']));
 
-const MIN_PASSWORD_LENGTH = 6;
 const MIN_FULLNAME_LENGTH = 2;
 const MAX_FULLNAME_LENGTH = 100;
 const FULLNAME_REGEX = /^[\p{L}\s\-'.]+$/u;
@@ -36,12 +33,7 @@ function validateField(field, values, touchedState) {
       return null;
     case 'email':
       if (!EMAIL_REGEX.test(val)) return 'Enter a valid email address.';
-      if (val.split('@')[1]?.toLowerCase() !== 'uog.edu.pk') return 'Email must be from @uog.edu.pk.';
       return null;
-    case 'password':
-      return val.length < MIN_PASSWORD_LENGTH ? `Password must be at least ${MIN_PASSWORD_LENGTH} characters.` : null;
-    case 'confirmPassword':
-      return values.password !== values.confirmPassword ? 'Passwords do not match.' : null;
     case 'session':
       return null; // value is session id from dropdown
     case 'designation':
@@ -128,7 +120,6 @@ export default function EvaluatorRegisterForm({ onBack, onSubmit, onLogin }) {
     }
 
     const payload = { ...values };
-    delete payload.confirmPassword;
     payload.session_id = payload.session;
     delete payload.session;
     if (!payload.defenseType) payload.defenseType = 'd1';
@@ -154,8 +145,6 @@ export default function EvaluatorRegisterForm({ onBack, onSubmit, onLogin }) {
 
   const fullNameError = getError({ name: 'fullName' }, touched);
   const emailError = getError({ name: 'email' }, touched);
-  const passwordError = getError({ name: 'password' }, touched);
-  const confirmPasswordError = getError({ name: 'confirmPassword' }, touched);
   const sessionError = getError({ name: 'session' }, touched);
   const defenseTypeError = getError({ name: 'defenseType' }, touched);
   const designationError = getError({ name: 'designation' }, touched);
@@ -234,7 +223,7 @@ export default function EvaluatorRegisterForm({ onBack, onSubmit, onLogin }) {
               id="email"
               name="email"
               type="email"
-              placeholder="name@uog.edu.pk"
+              placeholder="name@example.com"
               value={values.email ?? ''}
               onChange={handleChange('email')}
               onBlur={handleBlur('email')}
@@ -246,56 +235,6 @@ export default function EvaluatorRegisterForm({ onBack, onSubmit, onLogin }) {
             {emailError && (
               <span id="email-error" className={errorClass} role="alert">
                 {emailError}
-              </span>
-            )}
-          </div>
-
-          <div className={fieldWrapClass}>
-            <label htmlFor="password" className={labelClass}>
-              Password<span className="text-red-500 ml-0.5">*</span>
-            </label>
-            <input
-              id="password"
-              name="password"
-              type="password"
-              placeholder="Min 6 characters"
-              value={values.password ?? ''}
-              onChange={handleChange('password')}
-              onBlur={handleBlur('password')}
-              required
-              autoComplete="new-password"
-              aria-invalid={!!passwordError}
-              aria-describedby={passwordError ? 'password-error' : undefined}
-              className={inputClass}
-            />
-            {passwordError && (
-              <span id="password-error" className={errorClass} role="alert">
-                {passwordError}
-              </span>
-            )}
-          </div>
-
-          <div className={fieldWrapClass}>
-            <label htmlFor="confirmPassword" className={labelClass}>
-              Confirm password<span className="text-red-500 ml-0.5">*</span>
-            </label>
-            <input
-              id="confirmPassword"
-              name="confirmPassword"
-              type="password"
-              placeholder="••••••••"
-              value={values.confirmPassword ?? ''}
-              onChange={handleChange('confirmPassword')}
-              onBlur={handleBlur('confirmPassword')}
-              required
-              autoComplete="new-password"
-              aria-invalid={!!confirmPasswordError}
-              aria-describedby={confirmPasswordError ? 'confirmPassword-error' : undefined}
-              className={inputClass}
-            />
-            {confirmPasswordError && (
-              <span id="confirmPassword-error" className={errorClass} role="alert">
-                {confirmPasswordError}
               </span>
             )}
           </div>

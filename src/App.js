@@ -1,10 +1,6 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
 import './index.css';
-import Main from './components/Main';
-import StudentLoginForm from './components/Login/StudentLoginForm';
-import AdminLoginForm from './components/Login/AdminLoginForm';
-import SupervisorLoginForm from './components/Login/SupervisorLoginForm';
-import EvaluatorLoginForm from './components/Login/EvaluatorLoginForm';
+import LoginForm from './components/Login/LoginForm';
 import DashboardLayout from './components/DashboardLayout';
 import DashboardHome from './components/DashboardHome';
 import DashboardPlaceholder from './components/DashboardPlaceholder';
@@ -48,15 +44,13 @@ import AdminD1EvaluationForm from './components/admin/AdminD1EvaluationForm';
 import SupervisorD1EvaluationForm from './components/supervisor/SupervisorD1EvaluationForm';
 import EvaluatorD1EvaluationForm from './components/evaluator/EvaluatorD1EvaluationForm';
 import FIA from './components/FIA';
+import SetPassword from './components/SetPassword';
 
 function App() {
   return (
     <Routes>
-      <Route path="/" element={<Main />} />
-      <Route path="/student-login" element={<StudentLoginForm />} />
-      <Route path="/admin-login" element={<AdminLoginForm />} />
-      <Route path="/supervisor-login" element={<SupervisorLoginForm />} />
-      <Route path="/evaluator-login" element={<EvaluatorLoginForm />} />
+      <Route path="/" element={<LoginForm />} />
+      <Route path="/set-password" element={<SetPassword />} />
 
       <Route path="/dashboard" element={<DashboardLayout />}>
         <Route index element={<DashboardHome />} />
