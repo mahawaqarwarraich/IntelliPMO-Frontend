@@ -81,6 +81,7 @@ export default function PanelAssignmentD2() {
     try {
       const res = await api.post(`/api/panels/${selectedPanelId}/assign-groups`, {
         groupIds: selectedGroupIds,
+        defenseType: 'd2',
       });
       const msg = res.data?.message ?? 'Assignment(s) created successfully.';
       showToast(msg, 'success');
