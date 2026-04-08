@@ -20,6 +20,7 @@ export const sidebarLinks = {
     { label: 'Create panels for D1', path: '/dashboard/create-panels-d1', icon: 'users' },
     { label: 'Create panels for D2', path: '/dashboard/create-panels-d2', icon: 'users' },
     { label: 'Panel assignment D1', path: '/dashboard/panel-assignment-d1', icon: 'users' },
+    { label: 'Panel assignment D2', path: '/dashboard/panel-assignment-d2', icon: 'users' },
     { label: 'Panels for D1', path: '/dashboard/panels-d1', icon: 'users' },
     { label: 'Give D1 marks', path: '/dashboard/give-d1-marks', icon: 'file' },
     { label: 'Create deadline', path: '/dashboard/create-deadline', icon: 'calendar' },
