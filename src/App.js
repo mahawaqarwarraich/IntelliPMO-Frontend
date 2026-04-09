@@ -38,6 +38,7 @@ import CreatePanelsD2 from './components/admin/CreatePanelsD2';
 import PanelAssignmentD1 from './components/admin/PanelAssignmentD1';
 import PanelAssignmentD2 from './components/admin/PanelAssignmentD2';
 import PanelsForD1 from './components/all/PanelsForD1';
+import PanelsForD2 from './components/all/PanelsForD2';
 import GiveD1MarksAdmin from './components/admin/GiveD1Marks';
 import GiveD1MarksSupervisor from './components/supervisor/GiveD1Marks';
 import GiveD1MarksEvaluator from './components/evaluator/GiveD1Marks';
@@ -71,6 +72,7 @@ function App() {
         <Route path="panel-assignment-d1" element={<PanelAssignmentD1 />} />
         <Route path="panel-assignment-d2" element={<PanelAssignmentD2 />} />
         <Route path="panels-d1" element={<PanelsForD1 />} />
+        <Route path="panels-d2" element={<PanelsForD2 />} />
         <Route path="all-sessions" element={<DashboardPlaceholder />} />
         <Route path="all-domains" element={<AllDomains />} />
         <Route path="all-supervisors" element={<DashboardPlaceholder />} />
