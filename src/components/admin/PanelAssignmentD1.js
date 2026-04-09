@@ -31,7 +31,7 @@ export default function PanelAssignmentD1() {
     setError('');
     Promise.all([
       api.get('/api/panels', { params: { defenseType: 'd1' } }),
-      api.get('/api/admin/groups/registered-unassigned'),
+      api.get('/api/admin/groups/registered-unassigned', { params: { defenseType: 'd1' } }),
     ])
       .then(([panelsRes, groupsRes]) => {
         const panelList = Array.isArray(panelsRes.data?.panels) ? panelsRes.data.panels : [];
