@@ -63,8 +63,8 @@ export const sidebarLinks = {
     { label: 'Group Requests', path: '/dashboard/supervisor/group-requests', icon: 'file' },
     { label: 'My groups', path: '/dashboard/my-groups', icon: 'users' },
     { label: 'All registered groups', path: '/dashboard/all-groups', icon: 'users' },
-    { label: 'Give D1 marks', path: '/dashboard/supervisor/give-d1-marks/', icon: 'file' },
-    { label: 'Give D2 marks', path: '/dashboard/supervisor/give-d2-marks/', icon: 'file' },
+    { label: 'Give D1 marks', path: '/dashboard/supervisor/give-d1-marks', icon: 'file' },
+    { label: 'Give D2 marks', path: '/dashboard/supervisor/give-d2-marks', icon: 'file' },
     { label: 'Chat with FIA', path: '/dashboard/fia', icon: 'ai' },
   ],
   evaluator: [

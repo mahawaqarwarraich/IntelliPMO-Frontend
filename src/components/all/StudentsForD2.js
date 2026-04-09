@@ -7,6 +7,8 @@ export default function StudentsForD2() {
   const { groupId } = useParams();
   const { user } = useAuth();
   const isAdmin = user?.role === 'Admin';
+  const isSupervisor = user?.role === 'Supervisor';
+  const isEvaluator = user?.role === 'Evaluator';
   const [loading, setLoading] = useState(true);
   const [sessionOk, setSessionOk] = useState(false);
   const [students, setStudents] = useState([]);
@@ -89,7 +91,13 @@ export default function StudentsForD2() {
               <li key={s._id} className="p-4 hover:bg-gray-50/50 flex items-center justify-between">
                 <div>
                   <Link
-                    to={`/dashboard/give-d2-marks/group/${groupId}/student/${s._id}`}
+                    to={
+                      isEvaluator
+                        ? `/dashboard/evaluator/give-d2-marks/group/${groupId}/student/${s._id}`
+                        : isSupervisor
+                          ? `/dashboard/supervisor/give-d2-marks/group/${groupId}/student/${s._id}`
+                          : `/dashboard/give-d2-marks/group/${groupId}/student/${s._id}`
+                    }
                     state={{ rollNo: s.rollNo, fullName: s.fullName }}
                     className="text-accent font-medium hover:underline"
                   >
@@ -99,6 +107,22 @@ export default function StudentsForD2() {
                 </div>
                 {isAdmin && s.adminD2Marks && (
                   <span className="inline-flex items-center text-green-600 text-sm font-medium" title="Admin D2 marks recorded">
+                    ✓
+                  </span>
+                )}
+                {isSupervisor && s.supervisorD2Marks && (
+                  <span
+                    className="inline-flex items-center text-green-600 text-sm font-medium"
+                    title="Supervisor D2 marks recorded"
+                  >
+                    ✓
+                  </span>
+                )}
+                {isEvaluator && s.evaluatorD2Marks && (
+                  <span
+                    className="inline-flex items-center text-green-600 text-sm font-medium"
+                    title="Evaluator D2 marks recorded"
+                  >
                     ✓
                   </span>
                 )}
