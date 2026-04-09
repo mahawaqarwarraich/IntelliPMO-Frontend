@@ -24,6 +24,7 @@ export const sidebarLinks = {
     { label: 'Panel assignment D2', path: '/dashboard/panel-assignment-d2', icon: 'users' },
     { label: 'Panels for D2', path: '/dashboard/panels-d2', icon: 'users' },
     { label: 'Give D1 marks', path: '/dashboard/give-d1-marks', icon: 'file' },
+    { label: 'Give D2 marks', path: '/dashboard/give-d2-marks', icon: 'file' },
     { label: 'Create deadline', path: '/dashboard/create-deadline', icon: 'calendar' },
     { label: 'All deadlines', path: '/dashboard/all-deadlines', icon: 'calendar' },
     { label: 'All submissions', path: '/dashboard/all-submissions', icon: 'file' },
@@ -63,6 +64,7 @@ export const sidebarLinks = {
     { label: 'My groups', path: '/dashboard/my-groups', icon: 'users' },
     { label: 'All registered groups', path: '/dashboard/all-groups', icon: 'users' },
     { label: 'Give D1 marks', path: '/dashboard/supervisor/give-d1-marks/', icon: 'file' },
+    { label: 'Give D2 marks', path: '/dashboard/supervisor/give-d2-marks/', icon: 'file' },
     { label: 'Chat with FIA', path: '/dashboard/fia', icon: 'ai' },
   ],
   evaluator: [
@@ -74,6 +76,7 @@ export const sidebarLinks = {
     { label: 'Complete FYP guide/lifecycle', path: '/dashboard/fyp-guide', icon: 'file' },
     { label: 'Panels for D1', path: '/dashboard/panels-d1', icon: 'users' },
     { label: 'Give D1 marks', path: '/dashboard/evaluator/give-d1-marks', icon: 'file' },
+    { label: 'Give D2 marks', path: '/dashboard/evaluator/give-d2-marks', icon: 'file' },
     { label: 'Chat with FIA', path: '/dashboard/fia', icon: 'ai' },
   ],
 };
