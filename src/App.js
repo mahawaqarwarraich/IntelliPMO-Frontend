@@ -51,6 +51,8 @@ import StudentsForD2 from './components/all/StudentsForD2';
 import AdminD2EvaluationForm from './components/admin/AdminD2EvaluationForm';
 import GiveD2MarksSupervisor from './components/supervisor/GiveD2Marks';
 import SupervisorD2EvaluationForm from './components/supervisor/SupervisorD2EvaluationForm';
+import GiveD2MarksEvaluator from './components/evaluator/GiveD2Marks';
+import EvaluatorD2EvaluationForm from './components/evaluator/EvaluatorD2EvaluationForm';
 import FIA from './components/FIA';
 import SetPassword from './components/SetPassword';
 
@@ -104,9 +106,11 @@ function App() {
         <Route path="evaluator/give-d1-marks/group/:groupId/student/:studentId" element={<EvaluatorD1EvaluationForm />} />
         <Route path="give-d2-marks" element={<GiveD2MarksAdmin />} />
         <Route path="supervisor/give-d2-marks" element={<GiveD2MarksSupervisor />} />
+        <Route path="evaluator/give-d2-marks" element={<GiveD2MarksEvaluator />} />
         <Route path="give-d2-marks/group/:groupId" element={<StudentsForD2 />} />
         <Route path="give-d2-marks/group/:groupId/student/:studentId" element={<AdminD2EvaluationForm />} />
         <Route path="supervisor/give-d2-marks/group/:groupId/student/:studentId" element={<SupervisorD2EvaluationForm />} />
+        <Route path="evaluator/give-d2-marks/group/:groupId/student/:studentId" element={<EvaluatorD2EvaluationForm />} />
         <Route path="chat-rooms" element={<ChatRoom />}>
           <Route path=":groupId" element={<Group />} />
         </Route>
