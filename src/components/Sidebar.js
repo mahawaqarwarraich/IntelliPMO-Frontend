@@ -61,7 +61,26 @@ function getInitial(str) {
 export default function Sidebar({ isOpen = true, isOverlay = false, onOverlayClose }) {
   const { user } = useAuth();
   const roleKey = (user?.role || '').toLowerCase();
-  const links = sidebarLinks[roleKey] || sidebarLinks.admin;
+  const rawLinks = sidebarLinks[roleKey] || sidebarLinks.admin;
+
+  const evaluatorDefenseType = typeof user?.defenseType === 'string' ? user.defenseType.trim().toLowerCase() : '';
+  const links =
+    roleKey === 'evaluator' && (evaluatorDefenseType === 'd1' || evaluatorDefenseType === 'd2')
+      ? rawLinks.filter((l) => {
+          const p = String(l?.path || '');
+          const isD1OnlyLink =
+            p === '/dashboard/panels-d1' ||
+            p === '/dashboard/evaluator/give-d1-marks' ||
+            p.startsWith('/dashboard/give-d1-marks');
+          const isD2OnlyLink =
+            p === '/dashboard/panels-d2' ||
+            p === '/dashboard/evaluator/give-d2-marks' ||
+            p.startsWith('/dashboard/give-d2-marks');
+
+          if (evaluatorDefenseType === 'd1') return !isD2OnlyLink;
+          return !isD1OnlyLink;
+        })
+      : rawLinks;
 
   const widthClass = isOverlay ? 'w-64' : isOpen ? 'w-64' : 'w-0 min-w-0';
 

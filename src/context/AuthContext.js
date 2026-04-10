@@ -23,6 +23,7 @@ export function AuthProvider({ children }) {
             fullName: parsed.fullName || null,
             department: parsed.department || null,
             sessionId: parsed.sessionId || null,
+            defenseType: parsed.defenseType || null,
           });
           localStorage.setItem(TOKEN_KEY, parsed.token);
         }
@@ -35,7 +36,7 @@ export function AuthProvider({ children }) {
   }, []);
 
   const login = (userData) => {
-    const { id, token, role, fullName, department, sessionId } = userData;
+    const { id, token, role, fullName, department, sessionId, defenseType } = userData;
     if (!id || !token || !role) return;
     const u = {
       id,
@@ -44,6 +45,7 @@ export function AuthProvider({ children }) {
       fullName: fullName || null,
       department: department || null,
       sessionId: sessionId || null,
+      defenseType: defenseType || null,
     };
     setUserState(u);
     localStorage.setItem(AUTH_USER_KEY, JSON.stringify(u));

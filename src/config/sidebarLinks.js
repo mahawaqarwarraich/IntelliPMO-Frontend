@@ -75,6 +75,7 @@ export const sidebarLinks = {
     { label: 'FYP Events', path: '/dashboard/fyp-events', icon: 'calendar' },
     { label: 'Complete FYP guide/lifecycle', path: '/dashboard/fyp-guide', icon: 'file' },
     { label: 'Panels for D1', path: '/dashboard/panels-d1', icon: 'users' },
+    { label: 'Panels for D2', path: '/dashboard/panels-d2', icon: 'users' },
     { label: 'Give D1 marks', path: '/dashboard/evaluator/give-d1-marks', icon: 'file' },
     { label: 'Give D2 marks', path: '/dashboard/evaluator/give-d2-marks', icon: 'file' },
     { label: 'Chat with FIA', path: '/dashboard/fia', icon: 'ai' },

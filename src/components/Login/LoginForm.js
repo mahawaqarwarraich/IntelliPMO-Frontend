@@ -100,9 +100,10 @@ export default function LoginForm() {
         const fullName = userObj?.fullName;
         const department = userObj?.department;
         const sessionId = userObj?.session_id;
+        const defenseType = userObj?.defenseType;
 
         if (id && token) {
-          login({ id, token, role: result.role, fullName, department, sessionId });
+          login({ id, token, role: result.role, fullName, department, sessionId, defenseType });
           navigate('/dashboard');
           return;
         }
