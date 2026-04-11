@@ -67,7 +67,7 @@ export default function FIA() {
           </div>
           <div className="min-w-0 flex-1">
             <h2 className="text-sm sm:text-base font-semibold text-gray-900 truncate">FIA - FYP Intelligent Assistant</h2>
-            <p className="text-xs text-gray-500 truncate">I can answer common questions and help you understand how FMS works.</p>
+            <p className="text-xs text-gray-500 truncate">I can answer common questions and help you understand how IntelliPMO works.</p>
           </div>
         </header>
 
