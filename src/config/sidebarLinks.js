@@ -50,6 +50,7 @@ export const sidebarLinks = {
     { label: 'All registered groups', path: '/dashboard/all-groups', icon: 'users' },
     { label: 'All deadlines', path: '/dashboard/all-deadlines', icon: 'calendar' },
     { label: 'Chat with FIA', path: '/dashboard/fia', icon: 'ai' },
+    { label: 'FYP Grade', path: '/dashboard/fyp-grade', icon: 'file' },
   ],
   supervisor: [
     { label: 'Chat rooms', path: '/dashboard/chat-rooms', icon: 'message' },

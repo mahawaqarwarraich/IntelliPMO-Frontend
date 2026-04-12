@@ -6,6 +6,7 @@ import DashboardHome from './components/DashboardHome';
 import DashboardPlaceholder from './components/DashboardPlaceholder';
 import ToggleGrade from './components/admin/ToggleGrade';
 import FypGuide from './components/FypGuide';
+import FypGrade from './components/FypGrade';
 import FypResources from './components/FypResources';
 import FypEvents from './components/FypEvents';
 import ManageSessions from './components/admin/ManageSessions';
@@ -120,6 +121,14 @@ function App() {
         <Route path="register-group" element={<RegisterGroup />} />
         <Route path="request-status" element={<ProtectedRoute><GroupStatus /></ProtectedRoute>} />
         <Route path="fyp-guide" element={<FypGuide />} />
+        <Route
+          path="fyp-grade"
+          element={
+            <ProtectedRoute roles={['Student']}>
+              <FypGrade />
+            </ProtectedRoute>
+          }
+        />
         <Route path="fia" element={<FIA />} />
         <Route path="meetings" element={<DashboardPlaceholder />} />
         <Route path="create-meeting" element={<CreateMeeting />} />
