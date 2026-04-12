@@ -4,6 +4,7 @@ import LoginForm from './components/Login/LoginForm';
 import DashboardLayout from './components/DashboardLayout';
 import DashboardHome from './components/DashboardHome';
 import DashboardPlaceholder from './components/DashboardPlaceholder';
+import ToggleGrade from './components/admin/ToggleGrade';
 import FypGuide from './components/FypGuide';
 import FypResources from './components/FypResources';
 import FypEvents from './components/FypEvents';
@@ -111,6 +112,7 @@ function App() {
         <Route path="give-d2-marks/group/:groupId/student/:studentId" element={<AdminD2EvaluationForm />} />
         <Route path="supervisor/give-d2-marks/group/:groupId/student/:studentId" element={<SupervisorD2EvaluationForm />} />
         <Route path="evaluator/give-d2-marks/group/:groupId/student/:studentId" element={<EvaluatorD2EvaluationForm />} />
+        <Route path="toggle-grade" element={<ToggleGrade />} />
         <Route path="chat-rooms" element={<ChatRoom />}>
           <Route path=":groupId" element={<Group />} />
         </Route>

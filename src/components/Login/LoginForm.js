@@ -3,8 +3,11 @@ import { useNavigate } from 'react-router-dom';
 import { api } from '../../api/client.js';
 import { useAuth } from '../../context/AuthContext.js';
 
+const LOGIN_SUCCESS_REDIRECT_MS = 1500;
+
 const MIN_PASSWORD_LENGTH = 6;
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const STUDENT_ROLL_REGEX = /^\d{8}-\d{3}$/;
 
 function validateField(field, values, touchedState) {
   const val = (values[field.name] ?? '').trim();
@@ -13,8 +16,9 @@ function validateField(field, values, touchedState) {
   if (!val) return t ? 'This field is required.' : null;
 
   switch (field.name) {
-    case 'email':
-      if (!EMAIL_REGEX.test(val)) return 'Please enter a valid email address.';
+    case 'identifier':
+      if (STUDENT_ROLL_REGEX.test(val)) return null;
+      if (!EMAIL_REGEX.test(val)) return 'Enter a valid email or roll number (e.g. 21011519-085).';
       return null;
     case 'password':
       return val.length < MIN_PASSWORD_LENGTH ? `Password must be at least ${MIN_PASSWORD_LENGTH} characters.` : null;
@@ -29,34 +33,33 @@ const labelClass = 'text-[13px] font-medium text-gray-900';
 const errorClass = 'text-xs text-red-600 mt-0.5';
 const fieldWrapClass = 'flex flex-col gap-1.5 min-w-0';
 
-async function tryLogin(payload) {
-  // Try known email+password login endpoints (students currently use rollNo in backend).
-  const attempts = [
-    { role: 'Admin', url: '/api/admins/login', key: 'admin' },
-    { role: 'Supervisor', url: '/api/supervisors/login', key: 'supervisor' },
-    { role: 'Evaluator', url: '/api/evaluators/login', key: 'evaluator' },
-  ];
-
-  let lastErr = null;
-  for (const a of attempts) {
-    try {
-      const res = await api.post(a.url, payload);
-      return { ...a, res };
-    } catch (e) {
-      lastErr = e;
-    }
-  }
-  throw lastErr || new Error('Login failed.');
-}
-
 export default function LoginForm() {
   const navigate = useNavigate();
   const { login } = useAuth();
-  const [values, setValues] = useState({ email: '', password: '' });
+  const [values, setValues] = useState({ identifier: '', password: '' });
   const [touched, setTouched] = useState({});
   const [submitError, setSubmitError] = useState('');
   const [submitting, setSubmitting] = useState(false);
+  const [toast, setToast] = useState({ show: false, message: '', type: 'success' });
+  const toastTimerRef = useRef(null);
+  const redirectTimerRef = useRef(null);
   const firstErrorIdRef = useRef(null);
+
+  const showToast = useCallback((message, type = 'success') => {
+    if (toastTimerRef.current) clearTimeout(toastTimerRef.current);
+    setToast({ show: true, message, type });
+    toastTimerRef.current = setTimeout(() => {
+      setToast((t) => ({ ...t, show: false }));
+      toastTimerRef.current = null;
+    }, 5000);
+  }, []);
+
+  useEffect(() => {
+    return () => {
+      if (toastTimerRef.current) clearTimeout(toastTimerRef.current);
+      if (redirectTimerRef.current) clearTimeout(redirectTimerRef.current);
+    };
+  }, []);
 
   const handleChange = (name) => (e) => {
     setValues((prev) => ({ ...prev, [name]: e.target.value }));
@@ -65,7 +68,7 @@ export default function LoginForm() {
 
   const handleBlur = (name) => () => setTouched((prev) => ({ ...prev, [name]: true }));
 
-  const getError = (field, touchedState) => validateField(field, values, touchedState ?? touched);
+  const getError = useCallback((field, touchedState) => validateField(field, values, touchedState ?? touched), [values, touched]);
 
   useEffect(() => {
     if (!submitError || !firstErrorIdRef.current) return;
@@ -78,33 +81,41 @@ export default function LoginForm() {
     async (e) => {
       e.preventDefault();
       setSubmitError('');
-      const allTouched = { email: true, password: true };
+      const allTouched = { identifier: true, password: true };
       setTouched(allTouched);
 
-      const emailError = getError({ name: 'email' }, allTouched);
+      const identifierError = getError({ name: 'identifier' }, allTouched);
       const passwordError = getError({ name: 'password' }, allTouched);
-      if (emailError || passwordError) {
-        firstErrorIdRef.current = emailError ? 'email' : 'password';
+      if (identifierError || passwordError) {
+        firstErrorIdRef.current = identifierError ? 'identifier' : 'password';
         setSubmitError('Please fix the errors below.');
         return;
       }
 
-      const payload = { email: values.email.trim().toLowerCase(), password: values.password };
+      const rawId = values.identifier.trim();
+      const identifier = STUDENT_ROLL_REGEX.test(rawId) ? rawId : rawId.toLowerCase();
+      const payload = { identifier, password: values.password };
 
       setSubmitting(true);
       try {
-        const result = await tryLogin(payload);
-        const token = result.res.data?.token;
-        const userObj = result.res.data?.[result.key];
-        const id = userObj?._id;
-        const fullName = userObj?.fullName;
-        const department = userObj?.department;
-        const sessionId = userObj?.session_id;
-        const defenseType = userObj?.defenseType;
+        const res = await api.post('/api/auth/login', payload);
+        const token = res.data?.token;
+        const role = res.data?.role;
+        const user = res.data?.user;
+        const defenseType = res.data?.defenseType ?? user?.defenseType;
+        const id = user?._id;
+        const fullName = user?.fullName;
+        const department = user?.department;
+        const sessionId = user?.session_id;
 
-        if (id && token) {
-          login({ id, token, role: result.role, fullName, department, sessionId, defenseType });
-          navigate('/dashboard');
+        if (id && token && role) {
+          login({ id, token, role, fullName, department, sessionId, defenseType });
+          showToast(res.data?.message || 'Signed in successfully.', 'success');
+          if (redirectTimerRef.current) clearTimeout(redirectTimerRef.current);
+          redirectTimerRef.current = setTimeout(() => {
+            redirectTimerRef.current = null;
+            navigate('/dashboard');
+          }, LOGIN_SUCCESS_REDIRECT_MS);
           return;
         }
         setSubmitError('Login failed. Please try again.');
@@ -117,14 +128,43 @@ export default function LoginForm() {
         setSubmitting(false);
       }
     },
-    [getError, login, navigate, values.email, values.password]
+    [getError, login, navigate, showToast, values.identifier, values.password]
   );
 
-  const emailError = getError({ name: 'email' }, touched);
+  const identifierError = getError({ name: 'identifier' }, touched);
   const passwordError = getError({ name: 'password' }, touched);
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center py-8 px-4 bg-gray-50">
+      {toast.show && (
+        <div
+          style={{ animation: 'toast-fade-in 0.25s ease-out' }}
+          className={`fixed top-4 left-1/2 -translate-x-1/2 z-50 max-w-md w-[calc(100%-2rem)] px-4 py-3 rounded-lg shadow-lg text-white text-sm font-medium flex items-center gap-2 ${
+            toast.type === 'success' ? 'bg-green-600' : 'bg-red-600'
+          }`}
+          role="alert"
+        >
+          {toast.type === 'success' ? (
+            <svg className="w-5 h-5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
+              <path
+                fillRule="evenodd"
+                d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                clipRule="evenodd"
+              />
+            </svg>
+          ) : (
+            <svg className="w-5 h-5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
+              <path
+                fillRule="evenodd"
+                d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                clipRule="evenodd"
+              />
+            </svg>
+          )}
+          <span>{toast.message}</span>
+        </div>
+      )}
+
       <header className="text-center mb-6">
         <img
           src={`${process.env.PUBLIC_URL || ''}/intelliPMO-logo.svg`}
@@ -146,26 +186,27 @@ export default function LoginForm() {
 
           <div className="grid grid-cols-1 gap-4 sm:gap-5">
             <div className={fieldWrapClass}>
-              <label htmlFor="email" className={labelClass}>
-                Email<span className="text-red-500 ml-0.5">*</span>
+              <label htmlFor="identifier" className={labelClass}>
+                Email or roll number<span className="text-red-500 ml-0.5">*</span>
               </label>
               <input
-                id="email"
-                name="email"
-                type="email"
-                placeholder="e.g. name@example.com"
-                value={values.email}
-                onChange={handleChange('email')}
-                onBlur={handleBlur('email')}
+                id="identifier"
+                name="identifier"
+                type="text"
+                inputMode="text"
+                autoComplete="username"
+                placeholder="Staff email or student roll (e.g. 21011519-085)"
+                value={values.identifier}
+                onChange={handleChange('identifier')}
+                onBlur={handleBlur('identifier')}
                 required
-                aria-invalid={!!emailError}
-                aria-describedby={emailError ? 'email-error' : undefined}
+                aria-invalid={!!identifierError}
+                aria-describedby={identifierError ? 'identifier-error' : undefined}
                 className={inputClass}
-                autoComplete="email"
               />
-              {emailError && (
-                <span id="email-error" className={errorClass} role="alert">
-                  {emailError}
+              {identifierError && (
+                <span id="identifier-error" className={errorClass} role="alert">
+                  {identifierError}
                 </span>
               )}
             </div>
@@ -208,4 +249,3 @@ export default function LoginForm() {
     </div>
   );
 }
-
