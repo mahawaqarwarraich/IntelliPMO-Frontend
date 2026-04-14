@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { api } from '../../api/client';
 import { useAuth } from '../../context/AuthContext';
 
@@ -6,8 +6,25 @@ export default function ToggleGrade() {
   const { user } = useAuth();
   const isAdmin = user?.role === 'Admin';
   const [loading, setLoading] = useState(false);
+  const [statusLoading, setStatusLoading] = useState(false);
+  const [showGrade, setShowGrade] = useState(null);
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
+
+  useEffect(() => {
+    if (!isAdmin) return;
+    setStatusLoading(true);
+    setError('');
+    api
+      .get('/api/marks/show-grade-status')
+      .then((res) => {
+        setShowGrade(Boolean(res.data?.showGrade));
+      })
+      .catch((err) => {
+        setError(err.response?.data?.message ?? err.message ?? 'Request failed.');
+      })
+      .finally(() => setStatusLoading(false));
+  }, [isAdmin]);
 
   const handleToggle = useCallback(async () => {
     setLoading(true);
@@ -17,6 +34,9 @@ export default function ToggleGrade() {
       const res = await api.post('/api/marks/toggle-show-grade');
       const matched = res.data?.matchedCount ?? 0;
       const modified = res.data?.modifiedCount ?? 0;
+      if (typeof res.data?.showGrade === 'boolean') {
+        setShowGrade(res.data.showGrade);
+      }
       setMessage(
         res.data?.message
           ? `${res.data.message} (${modified} record(s) updated out of ${matched} matched.)`
@@ -53,6 +73,19 @@ export default function ToggleGrade() {
           <strong>active FYP session</strong>. When grades are hidden, students do not see their letter grade and GPA
           display; when shown, they can. You can use this to fully control how and when marks appear to students.
         </p>
+
+        <div className="mb-4">
+          <div className="text-sm text-gray-700">
+            Current status:{' '}
+            {statusLoading || showGrade == null ? (
+              <span className="font-medium text-gray-500">Loading…</span>
+            ) : showGrade ? (
+              <span className="font-semibold text-green-700">Showing marks to students</span>
+            ) : (
+              <span className="font-semibold text-amber-700">Hiding marks from students</span>
+            )}
+          </div>
+        </div>
 
         {error && (
           <div className="rounded-md bg-red-50 border border-red-200 py-2 px-3 text-sm text-red-700 mb-4" role="alert">
