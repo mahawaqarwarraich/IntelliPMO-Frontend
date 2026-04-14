@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useLayoutEffect, useRef, useCallback, useMemo } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { api } from '../api/client';
 
@@ -7,6 +7,10 @@ const inputClass =
 const labelClass = 'text-[13px] font-medium text-gray-900';
 const errorClass = 'text-xs text-red-600 mt-0.5';
 const fieldWrapClass = 'flex flex-col gap-1.5 min-w-0';
+
+function getStudentDisplay(student) {
+  return student ? `${student.rollNo ?? ''} — ${student.fullName ?? '—'}`.trim() || '—' : '—';
+}
 
 export default function RegisterGroup() {
   const { user } = useAuth();
@@ -37,9 +41,17 @@ export default function RegisterGroup() {
   const [memberQueries, setMemberQueries] = useState([]); // roll no / search text per slot
   const [focusedMemberIndex, setFocusedMemberIndex] = useState(null); // for dropdown visibility
   const [supervisorId, setSupervisorId] = useState('');
+  const [meStudent, setMeStudent] = useState(null);
+
+  /** Prefer /me payload; fall back to JWT-backed auth id (same value) if shape differs. */
+  const selfStudentId = useMemo(
+    () => meStudent?._id ?? user?.id ?? null,
+    [meStudent?._id, user?.id]
+  );
 
   useEffect(() => {
     if (!user?.token || user?.role !== 'Student') {
+      setMeStudent(null);
       setLoading(false);
       setSessionActive(false);
       return;
@@ -52,6 +64,7 @@ export default function RegisterGroup() {
       .then(([sessionRes, meRes]) => {
         const activeSession = sessionRes.data?.activeSession;
         const student = meRes.data?.student;
+        setMeStudent(student ?? null);
         const mySessionId = student?.session_id ?? null;
         const activeId = activeSession?._id ?? null;
 
@@ -67,12 +80,10 @@ export default function RegisterGroup() {
         setSessionActive(true);
         setMaxMembers(max);
         setMinMembers(min);
-        setMemberIds((prev) => {
-          return prev.length === max ? prev : Array(max).fill('');
-        });
       })
       .catch(() => {
         setSessionActive(false);
+        setMeStudent(null);
       })
       .finally(() => setLoading(false));
   }, [user?.token, user?.role]);
@@ -94,25 +105,27 @@ export default function RegisterGroup() {
       });
   }, [sessionActive, user?.token]);
 
-  useEffect(() => {
-    if (!sessionActive) return;
+  useLayoutEffect(() => {
+    if (!sessionActive || !selfStudentId) return;
     const len = maxMembers;
+    const selfDisplay = meStudent ? getStudentDisplay(meStudent) : '';
     setMemberIds((prev) => {
-      if (prev.length === len) return prev;
       const next = Array(len).fill('');
-      prev.forEach((v, i) => { if (i < len) next[i] = v; });
+      next[0] = selfStudentId;
+      for (let i = 1; i < len; i += 1) {
+        next[i] = i < prev.length ? prev[i] : '';
+      }
       return next;
     });
     setMemberQueries((prev) => {
-      if (prev.length === len) return prev;
       const next = Array(len).fill('');
-      prev.forEach((v, i) => { if (i < len) next[i] = v; });
+      next[0] = selfDisplay;
+      for (let i = 1; i < len; i += 1) {
+        next[i] = i < prev.length ? prev[i] : '';
+      }
       return next;
     });
-  }, [sessionActive, maxMembers]);
-
-  const getStudentDisplay = (student) =>
-    student ? `${student.rollNo ?? ''} — ${student.fullName ?? '—'}`.trim() || '—' : '—';
+  }, [sessionActive, maxMembers, selfStudentId, meStudent]);
 
   const getFilteredStudentsForSlot = (slotIndex) => {
     const query = (memberQueries[slotIndex] ?? '').trim().toLowerCase();
@@ -130,6 +143,7 @@ export default function RegisterGroup() {
   };
 
   const handleMemberInputChange = (index, value) => {
+    if (index === 0) return;
     setMemberQueries((prev) => {
       const next = [...prev];
       next[index] = value;
@@ -143,6 +157,7 @@ export default function RegisterGroup() {
   };
 
   const handleMemberSelect = (index, studentId) => {
+    if (index === 0) return;
     const s = students.find((x) => x._id === studentId);
     setMemberIds((prev) => {
       const next = [...prev];
@@ -168,6 +183,11 @@ export default function RegisterGroup() {
     const nameTrimmed = ideaName?.trim() || '';
     if (nameTrimmed.length < 2) {
       setSubmitError('Idea name is required (at least 2 characters).');
+      return;
+    }
+
+    if (!selfStudentId || String(memberIds[0] ?? '') !== String(selfStudentId)) {
+      setSubmitError('Your account must be listed as the first member.');
       return;
     }
 
@@ -199,8 +219,16 @@ export default function RegisterGroup() {
       setSubmitSuccess('Group submitted for approval.');
       setIdeaName('');
       setIdeaDescription('');
-      setMemberIds(Array(maxMembers).fill(''));
-      setMemberQueries(Array(maxMembers).fill(''));
+      setMemberIds(() => {
+        const arr = Array(maxMembers).fill('');
+        if (selfStudentId) arr[0] = selfStudentId;
+        return arr;
+      });
+      setMemberQueries(() => {
+        const arr = Array(maxMembers).fill('');
+        if (meStudent) arr[0] = getStudentDisplay(meStudent);
+        return arr;
+      });
       setFocusedMemberIndex(null);
       setSupervisorId(supervisors[0]?._id ?? '');
       showToast('Group submitted for approval.', 'success');
@@ -307,27 +335,42 @@ export default function RegisterGroup() {
         </div>
 
         {Array.from({ length: maxMembers }, (_, i) => {
+          const isSelfSlot = i === 0;
           const selectedStudent = memberIds[i] ? students.find((s) => s._id === memberIds[i]) : null;
-          const inputValue = selectedStudent ? getStudentDisplay(selectedStudent) : (memberQueries[i] ?? '');
-          const showDropdown = focusedMemberIndex === i;
+          const displaySource = isSelfSlot && meStudent ? selectedStudent || meStudent : selectedStudent;
+          const inputValue = displaySource
+            ? getStudentDisplay(displaySource)
+            : (memberQueries[i] ?? '');
+          const showDropdown = !isSelfSlot && focusedMemberIndex === i;
           const filtered = getFilteredStudentsForSlot(i);
           return (
             <div key={i} className={fieldWrapClass}>
               <label htmlFor={`member-${i}`} className={labelClass}>
-                Member {i + 1} — Roll no or name {i < minMembers ? <span className="text-red-500">*</span> : null}
+                Member {i + 1}
+                {isSelfSlot ? (
+                  <span className="text-gray-500 font-normal"> (you — cannot be changed)</span>
+                ) : (
+                  <> — Roll no or name {i < minMembers ? <span className="text-red-500">*</span> : null}</>
+                )}
               </label>
               <div className="relative">
                 <input
                   id={`member-${i}`}
                   type="text"
-                  placeholder="Type roll no or name to search…"
+                  placeholder={isSelfSlot ? '' : 'Type roll no or name to search…'}
                   value={inputValue}
                   onChange={(e) => handleMemberInputChange(i, e.target.value)}
-                  onFocus={() => handleMemberFocus(i)}
+                  onFocus={() => !isSelfSlot && handleMemberFocus(i)}
                   onBlur={handleMemberBlur}
-                  className={inputClass}
+                  readOnly={isSelfSlot}
+                  tabIndex={isSelfSlot ? -1 : undefined}
+                  className={
+                    isSelfSlot
+                      ? `${inputClass} bg-gray-50 text-gray-700 cursor-default`
+                      : inputClass
+                  }
                   autoComplete="off"
-                  aria-autocomplete="list"
+                  aria-autocomplete={isSelfSlot ? 'none' : 'list'}
                   aria-expanded={showDropdown && filtered.length > 0}
                   aria-controls={showDropdown ? `member-list-${i}` : undefined}
                 />
