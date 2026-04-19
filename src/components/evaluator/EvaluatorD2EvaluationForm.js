@@ -4,39 +4,18 @@ import { api } from '../../api/client';
 import { useAuth } from '../../context/AuthContext';
 
 const INITIAL_MARKS = {
-  understandingOfExistingSystem: '',
-  wellDefinedGoalsAndObjectives: '',
-  conceptualArchitecture: '',
-  presentationSkill: '',
-  functionalRequirement: '',
-  interfaces: '',
-  usecaseDescription: '',
-  usecaseDiagram: '',
-  nonFunctionalAttribute: '',
-  domainModelOrErd: '',
-  classDiagramOrDataFlowDiagram: '',
-  sequenceDiagramOrStateTransitionDiagram: '',
-  stateChartDiagramOrArchitecturalDiagram: '',
-  collaborationDiagramOrComponentDiagram: '',
-  partialWorkingSystem: '',
+  presentation: '',
+  completeWorkingSystem: '',
 };
 
 const RUBRIC_MAX_BY_KEY = {
-  understandingOfExistingSystem: 5,
-  wellDefinedGoalsAndObjectives: 5,
-  conceptualArchitecture: 5,
-  presentationSkill: 5,
-  functionalRequirement: 2,
-  interfaces: 2,
-  usecaseDescription: 2,
-  usecaseDiagram: 2,
-  nonFunctionalAttribute: 2,
-  domainModelOrErd: 2,
-  classDiagramOrDataFlowDiagram: 2,
-  sequenceDiagramOrStateTransitionDiagram: 2,
-  stateChartDiagramOrArchitecturalDiagram: 2,
-  collaborationDiagramOrComponentDiagram: 2,
-  partialWorkingSystem: 10,
+  presentation: 10,
+  completeWorkingSystem: 40,
+};
+
+const LABEL_BY_KEY = {
+  presentation: 'Presentation',
+  completeWorkingSystem: 'Complete working system',
 };
 
 export default function EvaluatorD2EvaluationForm() {
@@ -78,11 +57,11 @@ export default function EvaluatorD2EvaluationForm() {
       }
       const n = Number(raw);
       if (!Number.isFinite(n)) {
-        return { error: `Invalid number for ${key}.` };
+        return { error: `Invalid number for ${LABEL_BY_KEY[key] ?? key}.` };
       }
       const max = RUBRIC_MAX_BY_KEY[key];
       if (n < 0 || n > max) {
-        return { error: `${key} must be between 0 and ${max}.` };
+        return { error: `${LABEL_BY_KEY[key] ?? key} must be between 0 and ${max}.` };
       }
       body[key] = n;
     }
@@ -174,7 +153,7 @@ export default function EvaluatorD2EvaluationForm() {
           {Object.entries(RUBRIC_MAX_BY_KEY).map(([key, max]) => (
             <div key={key} className="max-w-sm">
               <label htmlFor={key} className="block text-sm font-medium text-gray-700 mb-1">
-                {key} <span className="text-gray-400 font-normal">(0–{max})</span>
+                {LABEL_BY_KEY[key] ?? key} <span className="text-gray-400 font-normal">(0–{max})</span>
               </label>
               <input
                 id={key}
