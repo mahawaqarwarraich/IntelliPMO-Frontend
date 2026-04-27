@@ -47,6 +47,7 @@ export const sidebarLinks = {
     { label: 'All meetings', path: '/dashboard/all-meetings', icon: 'calendar' },
     { label: 'Supervisor Allocation Status', path: '/dashboard/supervisor-allocation', icon: 'users' },
     { label: 'Panels for D1', path: '/dashboard/panels-d1', icon: 'users' },
+    { label: 'Panels for D2', path: '/dashboard/panels-d2', icon: 'users' },
     { label: 'All registered groups', path: '/dashboard/all-groups', icon: 'users' },
     { label: 'All deadlines', path: '/dashboard/all-deadlines', icon: 'calendar' },
     { label: 'Chat with FIA', path: '/dashboard/fia', icon: 'ai' },
