@@ -66,7 +66,14 @@ function App() {
       <Route path="/login" element={<LoginForm />} />
       <Route path="/set-password" element={<SetPassword />} />
 
-      <Route path="/dashboard" element={<DashboardLayout />}>
+      <Route
+        path="/dashboard"
+        element={
+          <ProtectedRoute>
+            <DashboardLayout />
+          </ProtectedRoute>
+        }
+      >
         <Route index element={<DashboardHome />} />
         <Route path="admin/create-student-account" element={<CreateStudentAccount />} />
         <Route path="admin/create-supervisor-account" element={<CreateSupervisorAccount />} />
