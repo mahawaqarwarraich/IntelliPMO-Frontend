@@ -133,9 +133,15 @@ export default function LoginForm() {
 
   const identifierError = getError({ name: 'identifier' }, touched);
   const passwordError = getError({ name: 'password' }, touched);
+  const loginBgUrl = `${process.env.PUBLIC_URL || ''}/uog.PNG`;
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center py-8 px-4 bg-gray-50">
+    <div
+      className="relative min-h-screen flex flex-col items-center justify-center py-8 px-4 bg-cover bg-center bg-no-repeat bg-gray-900"
+      style={{ backgroundImage: `url('${loginBgUrl}')` }}
+    >
+      <div className="absolute inset-0 bg-black/30 pointer-events-none" aria-hidden />
+      <div className="relative z-10 flex flex-col items-center w-full">
       {toast.show && (
         <div
           style={{ animation: 'toast-fade-in 0.25s ease-out' }}
@@ -245,6 +251,7 @@ export default function LoginForm() {
             {submitting ? 'Signing in…' : 'Log in'}
           </button>
         </form>
+      </div>
       </div>
     </div>
   );
