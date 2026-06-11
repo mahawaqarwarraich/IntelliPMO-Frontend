@@ -1,5 +1,6 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
 import './index.css';
+import LandingPage from './components/LandingPage';
 import LoginForm from './components/Login/LoginForm';
 import DashboardLayout from './components/DashboardLayout';
 import DashboardHome from './components/DashboardHome';
@@ -61,7 +62,8 @@ import SetPassword from './components/SetPassword';
 function App() {
   return (
     <Routes>
-      <Route path="/" element={<LoginForm />} />
+      <Route path="/" element={<LandingPage />} />
+      <Route path="/login" element={<LoginForm />} />
       <Route path="/set-password" element={<SetPassword />} />
 
       <Route path="/dashboard" element={<DashboardLayout />}>

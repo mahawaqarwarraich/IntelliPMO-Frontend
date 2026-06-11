@@ -102,7 +102,7 @@ export default function SetPassword() {
             <p className="text-sm text-red-700 m-0">{verifyError || 'Invalid or expired token.'}</p>
             <p className="text-xs text-gray-600 mt-3 mb-0">
               Go back to the{' '}
-              <Link to="/" className="text-accent font-medium hover:underline">
+              <Link to="/login" className="text-accent font-medium hover:underline">
                 home page
               </Link>
               .

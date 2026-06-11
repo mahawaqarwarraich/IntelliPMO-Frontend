@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { api } from '../../api/client.js';
 import { useAuth } from '../../context/AuthContext.js';
 
@@ -171,7 +171,13 @@ export default function LoginForm() {
         </div>
       )}
 
-      <header className="text-center mb-6">
+      <header className="text-center mb-6 w-full max-w-[min(90vw,28rem)]">
+        <Link
+          to="/"
+          className="inline-flex items-center gap-1 text-sm text-white/90 hover:text-white no-underline hover:no-underline mb-4 transition-colors"
+        >
+          ← Back to home
+        </Link>
         <img
           src={`${process.env.PUBLIC_URL || ''}/intelliPMO-logo.svg`}
           alt="IntelliPMO"
