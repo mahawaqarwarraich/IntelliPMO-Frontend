@@ -99,7 +99,7 @@ export default function ManageSessions() {
   const createErrors = {
     sessionYear: validateSessionYear(createForm.sessionYear),
     minCGPA: createTouched.minCGPA
-      ? validateNumber(createForm.minCGPA, { min: 1, max: 4, label: 'Min CGPA' })
+      ? validateNumber(createForm.minCGPA, { min: 1.5, max: 4, label: 'Min CGPA' })
       : null,
     minMembers: createTouched.minMembers
       ? validateNumber(createForm.minMembers, { min: 1, integer: true, label: 'Min members' })
@@ -150,7 +150,7 @@ export default function ManageSessions() {
     setCreateTouched(allTouched);
     const errs = {
       sessionYear: validateSessionYear(createForm.sessionYear),
-      minCGPA: validateNumber(createForm.minCGPA, { min: 1, max: 4, label: 'Min CGPA' }),
+      minCGPA: validateNumber(createForm.minCGPA, { min: 1.5, max: 4, label: 'Min CGPA' }),
       minMembers: validateNumber(createForm.minMembers, { min: 1, integer: true, label: 'Min members' }),
       maxMembers: (() => {
         const e = validateNumber(createForm.maxMembers, { min: 1, integer: true, label: 'Max members' });
@@ -322,13 +322,13 @@ export default function ManageSessions() {
                 aria-invalid={!!createErrors.sessionYear}
               />
             </Field>
-            <Field id="create-minCGPA" label="Min CGPA (1–4)" error={createErrors.minCGPA}>
+            <Field id="create-minCGPA" label="Min CGPA (1.5–4)" error={createErrors.minCGPA}>
               <input
                 id="create-minCGPA"
                 type="number"
-                min={1}
+                min={1.5}
                 max={4}
-                step="0.01"
+                step="0.1"
                 placeholder="e.g. 2.5"
                 value={createForm.minCGPA}
                 onChange={(e) => setCreate('minCGPA', e.target.value)}

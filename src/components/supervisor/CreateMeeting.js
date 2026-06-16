@@ -47,6 +47,7 @@ export default function CreateMeeting() {
       .then((sessionRes) => {
         const activeSessionId = sessionRes.data?.activeSessionId ?? null;
         const mySessionId = user?.sessionId ?? null;
+        console.log("Supervisor session id:", mySessionId, "Fetched active session id:", activeSessionId);
         if (!activeSessionId || !mySessionId || String(activeSessionId) !== String(mySessionId)) {
           setSessionOk(false);
           return;
